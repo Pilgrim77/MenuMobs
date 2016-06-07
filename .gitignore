@@ -4,6 +4,11 @@
 /build/
 /.gradle/
 /run/
+/.idea/
+/out/
 .project
 .classpath
 build.properties.old
+*.iml
+*.iws
+*.ipr

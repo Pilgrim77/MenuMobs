@@ -11,12 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ClientProxy extends CommonProxy
 {
     private BSMainMenuRenderTicker mainMenuTicker;
-    @Override
-    protected void registerGameTickHandler()
-    {
-        if (BSCClientTicker.allowUpdateCheck)
-            new BSCClientTicker();
-    }
+
     @Override
     protected void registerMainMenuTickHandler()
     {

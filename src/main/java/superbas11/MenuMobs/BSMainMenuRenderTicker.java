@@ -1,8 +1,8 @@
-package bspkrs.bspkrscore.fml;
+package superbas11.MenuMobs;
 
-import bspkrs.client.util.EntityUtils;
-import bspkrs.util.BSLog;
-import bspkrs.util.FakeWorld;
+import superbas11.MenuMobs.client.util.EntityUtils;
+import superbas11.util.LogHelper;
+import superbas11.util.FakeWorld;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.Minecraft;
@@ -75,12 +75,12 @@ public class BSMainMenuRenderTicker
     {
         if (Loader.isModLoaded("WorldStateCheckpoints"))
         {
-            bspkrsCoreMod.instance.showMainMenuMobs = false;
-            BSLog.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints has been disabled for the remainder of this session.");
+            MenuMobs.instance.showMainMenuMobs = false;
+            LogHelper.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints has been disabled for the remainder of this session.");
             this.unRegister();
         }
 
-        if (bspkrsCoreMod.instance.showMainMenuMobs && !erroredOut && (mcClient.currentScreen instanceof GuiMainMenu))
+        if (MenuMobs.instance.showMainMenuMobs && !erroredOut && (mcClient.currentScreen instanceof GuiMainMenu))
         {
             try
             {
@@ -113,7 +113,7 @@ public class BSMainMenuRenderTicker
             }
             catch (Throwable e)
             {
-                BSLog.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
+                LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
                 e.printStackTrace();
                 erroredOut = true;
                 mcClient.thePlayer = null;
@@ -135,10 +135,6 @@ public class BSMainMenuRenderTicker
 
             if (createNewWorld || (mcClient.thePlayer == null))
             {
-                //mcClient.thePlayer = new EntityClientPlayerMP(mcClient, world, mcClient.getSession(), null, null);
-                //mcClient.thePlayer = new EntityOtherPlayerMP(world,mcClient.getSession().getProfile());
-                if(mcClient.thePlayer == null)
-                    BSLog.severe("Player is null");
                 mcClient.thePlayer = new EntityPlayerSP(mcClient,world,new NetHandlerPlayClient(mcClient,mcClient.currentScreen,new NetworkManager(EnumPacketDirection.CLIENTBOUND),mcClient.getSession().getProfile()),null);
                 mcClient.thePlayer.dimension = 0;
                 mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
@@ -148,7 +144,7 @@ public class BSMainMenuRenderTicker
 
             if (createNewWorld || (randMob == null))
             {
-                if (bspkrsCoreMod.instance.allowDebugOutput)
+                if (MenuMobs.instance.allowDebugOutput)
                 {
                     randMob = getNextEntity(world);
                 }
@@ -164,7 +160,7 @@ public class BSMainMenuRenderTicker
         }
         catch (Throwable e)
         {
-            BSLog.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
+            LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
             e.printStackTrace();
             erroredOut = true;
             mcClient.thePlayer = null;
@@ -182,6 +178,7 @@ public class BSMainMenuRenderTicker
             if (++id >= entStrings.length)
                 id = 0;
             clazz = (Class) EntityList.stringToClassMapping.get(entStrings[id]);
+            LogHelper.info(entStrings[id].toString());
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
 
@@ -191,8 +188,8 @@ public class BSMainMenuRenderTicker
             return new EntityOtherPlayerMP(world, mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), false));
         }
 
-        if (bspkrsCoreMod.instance.allowDebugOutput)
-            BSLog.info(entStrings[id].toString());
+        if (MenuMobs.instance.allowDebugOutput)
+            LogHelper.info(entStrings[id].toString());
 
         return (EntityLivingBase) EntityList.createEntityByName((String) entStrings[id], world);
     }
@@ -230,7 +227,7 @@ public class BSMainMenuRenderTicker
     {
         if (!isRegistered)
         {
-            BSLog.info("Enabling Main Menu Mob render ticker");
+            LogHelper.info("Enabling Main Menu Mob render ticker");
             FMLCommonHandler.instance().bus().register(this);
             isRegistered = true;
         }
@@ -240,7 +237,7 @@ public class BSMainMenuRenderTicker
     {
         if (isRegistered)
         {
-            BSLog.info("Disabling Main Menu Mob render ticker");
+            LogHelper.info("Disabling Main Menu Mob render ticker");
             FMLCommonHandler.instance().bus().unregister(this);
             isRegistered = false;
             randMob = null;
@@ -293,7 +290,8 @@ public class BSMainMenuRenderTicker
         entityBlacklist.add("TwilightForest.Upper Goblin Knight");
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
-        // UUIDs gotten using http://connorlinfoot.com/uuid/
+        // UUIDs gotten using mctools.connorlinfoot.com
+        fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("41834a728902449586b8731b1c253afe"), "superbas11"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("92d459067a50474285b6b079db9dc189"), "bspkrs"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("2efa46fa29484d98b822fa182d254870"), "lorddusk"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("b9a89002b3924545ab4d5b1ff60c88a6"), "Arkember"));

@@ -1,4 +1,4 @@
-package bspkrs.util;
+package superbas11.util;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import net.minecraft.block.Block;
@@ -48,7 +48,7 @@ import java.util.Random;
 /**
  * Provides a fake world that can be used to render entities in client-side GUIs without a world actually running.
  *
- * @author bspkrs
+ * @author superbas11
  *
  */
 public class FakeWorld extends World

@@ -1,12 +1,12 @@
-package bspkrs.util;
+package superbas11.util;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import bspkrs.bspkrscore.fml.Reference;
+import superbas11.MenuMobs.Reference;
 
-public enum BSLog
+public enum LogHelper
 {
     INSTANCE;
 

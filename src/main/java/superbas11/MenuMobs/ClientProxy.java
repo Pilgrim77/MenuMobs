@@ -1,4 +1,4 @@
-package bspkrs.bspkrscore.fml;
+package superbas11.MenuMobs;
 
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -22,7 +22,7 @@ public class ClientProxy extends CommonProxy
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event)
     {
-        if (bspkrsCoreMod.instance.showMainMenuMobs)
+        if (MenuMobs.instance.showMainMenuMobs)
             if ((event.getGui() instanceof GuiMainMenu) && !mainMenuTicker.isRegistered())
                 mainMenuTicker.register();
             else if (mainMenuTicker.isRegistered())

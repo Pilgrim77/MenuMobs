@@ -1,4 +1,4 @@
-package bspkrs.bspkrscore.fml;
+package superbas11.MenuMobs;
 
 public class CommonProxy
 {

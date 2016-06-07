@@ -1,4 +1,4 @@
-package bspkrs.bspkrscore.fml;
+package superbas11.MenuMobs;
 
 import com.google.common.base.Throwables;
 import net.minecraftforge.common.config.Configuration;
@@ -28,9 +28,9 @@ public class Reference
     public static final String  MODID        = "MenuMobs";
     public static final String  NAME         = "Menu Mobs";
     public static final String  MC_VERSION;
-    public static final String  PROXY_COMMON = "bspkrs.bspkrscore.fml.CommonProxy";
-    public static final String  PROXY_CLIENT = "bspkrs.bspkrscore.fml.ClientProxy";
-    public static final String  GUI_FACTORY  = "bspkrs.bspkrscore.fml.gui.ModGuiFactoryHandler";
+    public static final String  PROXY_COMMON = "superbas11.MenuMobs.CommonProxy";
+    public static final String  PROXY_CLIENT = "superbas11.MenuMobs.ClientProxy";
+    public static final String  GUI_FACTORY  = "superbas11.MenuMobs.gui.ModGuiFactoryHandler";
 
     public static Configuration config       = null;
 }

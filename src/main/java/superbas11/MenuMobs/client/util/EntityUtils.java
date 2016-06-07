@@ -1,17 +1,6 @@
-package bspkrs.client.util;
-
-import java.lang.reflect.Field;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+package superbas11.MenuMobs.client.util;
 
 import com.mojang.authlib.GameProfile;
-
-import bspkrs.bspkrscore.fml.bspkrsCoreMod;
-import bspkrs.util.BSLog;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.model.ModelBase;
@@ -24,6 +13,12 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
+import superbas11.MenuMobs.MenuMobs;
+import superbas11.util.LogHelper;
+
+import java.lang.reflect.Field;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
 
 public class EntityUtils
 {
@@ -54,12 +49,12 @@ public class EntityUtils
 	 * the compiled ModelRenderers, it'll turn up with nothing <hipsterpig> if
 	 * you ask why i do that compile check, horse models. <hipsterpig> horse
 	 * models have horse, donkey, mule, armor, chest, all in one model, and in
-	 * one big cluttered mess <bspkrs> would renderPassModel work? <hipsterpig>
+	 * one big cluttered mess <superbas11> would renderPassModel work? <hipsterpig>
 	 * i've never looked at renderPassModel. I assumed renderPassModel would be
 	 * null for a lot mod entities, especially custom mobs with no armor equip
 	 * <hipsterpig> but.. that poi also never looked how minecraft swaps
-	 * villager zombies properly <hipsterpig> bspkrs: heh, <hipsterpig> but it's
-	 * too complicated for me to bother with <bspkrs> yep <bspkrs> seems like it
+	 * villager zombies properly <hipsterpig> superbas11: heh, <hipsterpig> but it's
+	 * too complicated for me to bother with <superbas11> yep <superbas11> seems like it
 	 * shouldn't be too hard, but then it is <hipsterpig> oh right <hipsterpig>
 	 * i forgot to tell you <hipsterpig> ModelBox doesn't actually store itself
 	 * as dimensions <hipsterpig> it stores x1 and x2 coords <hipsterpig> so you
@@ -252,8 +247,8 @@ public class EntityUtils
                         "Chicken", world);
         }
 
-        if (bspkrsCoreMod.instance.allowDebugOutput)
-            BSLog.info(entStrings[id].toString());
+        if (MenuMobs.instance.allowDebugOutput)
+            LogHelper.info(entStrings[id].toString());
 
         return (EntityLivingBase) EntityList.createEntityByName(
                 (String) entStrings[id], world);

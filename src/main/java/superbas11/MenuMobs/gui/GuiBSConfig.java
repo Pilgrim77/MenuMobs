@@ -1,10 +1,10 @@
-package bspkrs.bspkrscore.fml.gui;
+package superbas11.MenuMobs.gui;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.GuiConfig;
-import bspkrs.bspkrscore.fml.Reference;
+import superbas11.MenuMobs.Reference;
 
 public class GuiBSConfig extends GuiConfig
 {

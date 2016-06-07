@@ -1,9 +1,9 @@
 package bspkrs.bspkrscore.fml;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
+import bspkrs.util.CommonUtils;
+import bspkrs.util.Const;
+import bspkrs.util.ModVersionChecker;
+import bspkrs.util.UniqueNameListGenerator;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -21,10 +21,10 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import bspkrs.util.CommonUtils;
-import bspkrs.util.Const;
-import bspkrs.util.ModVersionChecker;
-import bspkrs.util.UniqueNameListGenerator;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod(modid = Reference.MODID, name = Reference.NAME, version = "@MOD_VERSION@", useMetadata = true, guiFactory = Reference.GUI_FACTORY)
 public class bspkrsCoreMod
@@ -38,6 +38,8 @@ public class bspkrsCoreMod
     public int                  updateTimeoutMilliseconds        = updateTimeoutMillisecondsDefault;
     private final boolean       generateUniqueNamesFileDefault   = true;
     public boolean              generateUniqueNamesFile          = generateUniqueNamesFileDefault;
+    private final boolean       showMainMenuMobsDefault          = true;
+    public boolean              showMainMenuMobs                 = showMainMenuMobsDefault;
 
     @Metadata(value = Reference.MODID)
     public static ModMetadata   metadata;
@@ -136,6 +138,8 @@ public class bspkrsCoreMod
     {
         if (generateUniqueNamesFile)
             UniqueNameListGenerator.instance().run();
+
+        proxy.registerMainMenuTickHandler();
     }
 
     @EventHandler

@@ -177,7 +177,7 @@ public class BSMainMenuRenderTicker
         {
             if (++id >= entStrings.length)
                 id = 0;
-            clazz = (Class) EntityList.stringToClassMapping.get(entStrings[id]);
+            clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
             LogHelper.info(entStrings[id].toString());
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
@@ -207,15 +207,15 @@ public class BSMainMenuRenderTicker
                 if (random.nextBoolean())
                 {
                     ((EntitySkeleton) ent).setSkeletonType(1);
-                    ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.golden_sword));
+                    ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
                 }
                 else
                     ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
             }
             else if (ent instanceof EntityPigZombie)
-                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.golden_sword));
+                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
             else if (ent instanceof EntityEnderman)
-                ((EntityEnderman) ent).setHeldBlockState(Blocks.grass.getDefaultState());
+                ((EntityEnderman) ent).setHeldBlockState(Blocks.GRASS.getDefaultState());
         }
         catch (Throwable e)
         {
@@ -288,6 +288,7 @@ public class BSMainMenuRenderTicker
         entityBlacklist.add("TwilightForest.Mist Wolf");
         entityBlacklist.add("TwilightForest.Mosquito Swarm");
         entityBlacklist.add("TwilightForest.Upper Goblin Knight");
+        entityBlacklist.add("graves.playerzombie");
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
         // UUIDs gotten using mctools.connorlinfoot.com
@@ -349,21 +350,21 @@ public class BSMainMenuRenderTicker
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("b97e12cedbb14c0cafc8132b708a9b88"), "XCompWiz"));
 
         playerItems = new ItemStack[] {
-                new ItemStack(Items.iron_sword), new ItemStack(Items.diamond_sword), new ItemStack(Items.golden_sword),
-                new ItemStack(Items.diamond_pickaxe), new ItemStack(Items.iron_pickaxe), new ItemStack(Items.iron_axe)
+                new ItemStack(Items.IRON_SWORD), new ItemStack(Items.DIAMOND_SWORD), new ItemStack(Items.GOLDEN_SWORD),
+                new ItemStack(Items.DIAMOND_PICKAXE), new ItemStack(Items.IRON_PICKAXE), new ItemStack(Items.IRON_AXE)
         };
 
         zombieItems = new ItemStack[] {
-                new ItemStack(Items.iron_sword), new ItemStack(Items.diamond_sword), new ItemStack(Items.golden_sword), new ItemStack(Items.iron_axe)
+                new ItemStack(Items.IRON_SWORD), new ItemStack(Items.DIAMOND_SWORD), new ItemStack(Items.GOLDEN_SWORD), new ItemStack(Items.IRON_AXE)
         };
 
         skelItems = new ItemStack[] {
-                new ItemStack(Items.bow), new ItemStack(Items.golden_sword), new ItemStack(Items.bow),
-                new ItemStack(Items.bow), new ItemStack(Items.bow), new ItemStack(Items.bow)
+                new ItemStack(Items.BOW), new ItemStack(Items.GOLDEN_SWORD), new ItemStack(Items.BOW),
+                new ItemStack(Items.BOW), new ItemStack(Items.BOW), new ItemStack(Items.BOW)
         };
 
         // Get a COPY dumbass!
-        entities = new TreeSet(EntityList.stringToClassMapping.keySet());
+        entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
         entities.removeAll(entityBlacklist);
         entStrings = entities.toArray(new Object[] {});
         id = -1;

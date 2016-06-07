@@ -1,6 +1,5 @@
 package superbas11.util;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -25,8 +24,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.*;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenPlains;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomePlains;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.IChunkLoader;
@@ -35,10 +34,10 @@ import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.IRenderHandler;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Collection;
@@ -60,14 +59,19 @@ public class FakeWorld extends World
         super(new FakeSaveHandler(),worldInfo, new FakeWorldProvider(),new Profiler(), true);
     }
 
+//    @Override
+//    public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
+//        return new BiomeGenPlains(false, (new BiomeGenBase.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
+//    }
+
     @Override
-    public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
-        return new BiomeGenPlains(false, (new BiomeGenBase.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
+    public Biome getBiomeGenForCoords(BlockPos pos) {
+        return new BiomePlains(false, (new Biome.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
     }
 
     @Override
-    public BiomeGenBase getBiomeGenForCoordsBody(BlockPos pos) {
-        return new BiomeGenPlains(false, (new BiomeGenBase.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
+    public Biome getBiomeForCoordsBody(BlockPos pos) {
+        return new BiomePlains(false, (new Biome.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
     }
 
     @Override
@@ -112,7 +116,7 @@ public class FakeWorld extends World
 
     @Override
     public IBlockState getBlockState(BlockPos pos) {
-       return pos.getY() > 63 ? Blocks.air.getDefaultState() : Blocks.grass.getDefaultState();
+       return pos.getY() > 63 ? Blocks.AIR.getDefaultState() : Blocks.GRASS.getDefaultState();
     }
 
     @Override
@@ -313,8 +317,8 @@ public class FakeWorld extends World
     {}
 
     @Override
-    public void removePlayerEntityDangerously(Entity par1Entity)
-    {}
+    public void removeEntityDangerously(Entity entityIn) {
+    }
 
     @Override
     public int calculateSkylightSubtracted(float par1)
@@ -397,16 +401,9 @@ public class FakeWorld extends World
     }
 
     @Override
-    public boolean isAnyLiquid(AxisAlignedBB par1AxisAlignedBB)
-    {
+    public boolean containsAnyLiquid(AxisAlignedBB bb) {
         return false;
     }
-
-//    @Override
-//    public boolean func_147470_e(AxisAlignedBB p_147470_1_)
-//    {
-//        return false;
-//    }
 
     @Override
     public boolean handleMaterialAcceleration(AxisAlignedBB par1AxisAlignedBB, Material par2Material, Entity par3Entity)
@@ -825,11 +822,11 @@ public class FakeWorld extends World
     }
 
     @Override
-    public void playAuxSFX(int p_175718_1_, BlockPos pos, int p_175718_3_) {
+    public void playEvent(@Nullable EntityPlayer player, int type, BlockPos pos, int data) {
     }
 
     @Override
-    public void playAuxSFXAtEntity(EntityPlayer player, int sfxType, BlockPos pos, int p_180498_4_) {
+    public void playEvent(int type, BlockPos pos, int data) {
     }
 
     @Override
@@ -907,12 +904,6 @@ public class FakeWorld extends World
     }
 
     @Override
-    public ImmutableSetMultimap<ChunkCoordIntPair, Ticket> getPersistentChunks()
-    {
-        return super.getPersistentChunks();
-    }
-
-    @Override
     public int countEntities(EnumCreatureType type, boolean forSpawnCount)
     {
         return 0;
@@ -946,12 +937,6 @@ public class FakeWorld extends World
         @Override
         protected void generateLightBrightnessTable()
         {}
-
-        @Override
-        protected void registerWorldChunkManager()
-        {
-            super.registerWorldChunkManager();
-        }
 
         @Override
         public boolean isSurfaceWorld()
@@ -1074,9 +1059,9 @@ public class FakeWorld extends World
         }
 
         @Override
-        public BiomeGenBase getBiomeGenForCoords(BlockPos pos)
+        public Biome getBiomeForCoords(BlockPos pos)
         {
-            return new BiomeGenPlains(false, (new BiomeGenBase.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
+            return new BiomePlains(false, (new Biome.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
         }
 
         @Override

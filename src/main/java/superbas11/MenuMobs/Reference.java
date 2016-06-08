@@ -6,31 +6,26 @@ import net.minecraftforge.common.config.Configuration;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Reference
-{
-    static
-    {
+public class Reference {
+    public static final String MODID = "MenuMobs";
+    public static final String NAME = "Menu Mobs";
+    public static final String MC_VERSION;
+    public static final String PROXY_COMMON = "superbas11.MenuMobs.CommonProxy";
+    public static final String PROXY_CLIENT = "superbas11.MenuMobs.ClientProxy";
+    public static final String GUI_FACTORY = "superbas11.MenuMobs.gui.ModGuiFactoryHandler";
+    public static Configuration config = null;
+
+    static {
         Properties prop = new Properties();
 
-        try
-        {
+        try {
             InputStream stream = Reference.class.getClassLoader().getResourceAsStream("version.properties");
             prop.load(stream);
             stream.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Throwables.propagate(e);
         }
 
         MC_VERSION = prop.getProperty("version.minecraft");
     }
-    public static final String  MODID        = "MenuMobs";
-    public static final String  NAME         = "Menu Mobs";
-    public static final String  MC_VERSION;
-    public static final String  PROXY_COMMON = "superbas11.MenuMobs.CommonProxy";
-    public static final String  PROXY_CLIENT = "superbas11.MenuMobs.ClientProxy";
-    public static final String  GUI_FACTORY  = "superbas11.MenuMobs.gui.ModGuiFactoryHandler";
-
-    public static Configuration config       = null;
 }

@@ -6,6 +6,7 @@
 /run/
 /.idea/
 /out/
+/libs/
 .project
 .classpath
 build.properties.old

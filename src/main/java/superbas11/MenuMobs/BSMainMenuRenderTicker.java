@@ -1,10 +1,11 @@
 package superbas11.MenuMobs;
 
-import superbas11.MenuMobs.client.util.EntityUtils;
-import superbas11.util.LogHelper;
-import superbas11.util.FakeWorld;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.*;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
@@ -37,222 +38,31 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
+import superbas11.MenuMobs.client.util.EntityUtils;
+import superbas11.MenuMobs.util.FakeWorld;
+import superbas11.MenuMobs.util.LogHelper;
 
+import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 @SideOnly(Side.CLIENT)
-public class BSMainMenuRenderTicker
-{
-    private static Minecraft                       mcClient;
-    private static boolean                         isRegistered = false;
-    private World                                  world;
-    private EntityLivingBase                       randMob;
-    @SuppressWarnings("unused")
-    private GuiScreen                              savedScreen;
-    private static List                            entityBlacklist;
+public class BSMainMenuRenderTicker {
+    private static Minecraft mcClient;
+    private static boolean isRegistered = false;
+    private static List entityBlacklist;
     private static List<SimpleEntry<UUID, String>> fallbackPlayerNames;
-    private static ItemStack[]                     playerItems;
-    private static ItemStack[]                     zombieItems;
-    private static ItemStack[]                     skelItems;
-    private static Random                          random       = new Random();
+    private static ItemStack[] playerItems;
+    private static ItemStack[] zombieItems;
+    private static ItemStack[] skelItems;
+    private static Random random = new Random();
+    private static Set entities;
+    private static Object[] entStrings;
+    private static int id;
+    private static boolean erroredOut = false;
 
-    private static Set                             entities;
-    private static Object[]                        entStrings;
-    private static int                             id;
-
-    private static boolean                         erroredOut   = false;
-
-    public BSMainMenuRenderTicker()
-    {
-        mcClient = FMLClientHandler.instance().getClient();
-    }
-
-
-    @SubscribeEvent
-    public void onTick(TickEvent.RenderTickEvent event)
-    {
-        if (Loader.isModLoaded("WorldStateCheckpoints"))
-        {
-            MenuMobs.instance.showMainMenuMobs = false;
-            LogHelper.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints has been disabled for the remainder of this session.");
-            this.unRegister();
-        }
-
-        if (MenuMobs.instance.showMainMenuMobs && !erroredOut && (mcClient.currentScreen instanceof GuiMainMenu))
-        {
-            try
-            {
-                if ((mcClient.thePlayer == null) || (mcClient.thePlayer.worldObj == null) || (randMob == null))
-                    init();
-
-                if ((world != null) && (mcClient.thePlayer != null) && (randMob != null))
-                {
-                    ScaledResolution sr = new ScaledResolution(mcClient);
-                    final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
-                    final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
-                    int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
-                    float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
-                    float scale = EntityUtils.getEntityScale(randMob, targetHeight, 1.8F);
-                    EntityUtils.drawEntityOnScreen(
-                            distanceToSide,
-                            (int) ((sr.getScaledHeight() / 2) + (randMob.height * scale)),
-                            scale,
-                            distanceToSide - mouseX,
-                            ((sr.getScaledHeight() / 2) + (randMob.height * scale)) - (randMob.height * scale * (randMob.getEyeHeight() / randMob.height)) - mouseY,
-                            randMob);
-                    EntityUtils.drawEntityOnScreen(
-                            sr.getScaledWidth() - distanceToSide,
-                            (int) ((sr.getScaledHeight() / 2) + (mcClient.thePlayer.height * targetHeight)),
-                            targetHeight,
-                            sr.getScaledWidth() - distanceToSide - mouseX,
-                            ((sr.getScaledHeight() / 2) + (mcClient.thePlayer.height * targetHeight)) - (mcClient.thePlayer.height * targetHeight * (mcClient.thePlayer.getEyeHeight() / mcClient.thePlayer.height)) - mouseY,
-                            mcClient.thePlayer);
-                }
-            }
-            catch (Throwable e)
-            {
-                LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
-                e.printStackTrace();
-                erroredOut = true;
-                mcClient.thePlayer = null;
-                randMob = null;
-                world = null;
-            }
-        }
-    }
-
-    private void init()
-    {
-        try
-        {
-            boolean createNewWorld = world == null;
-            WorldInfo worldInfo = new WorldInfo(new NBTTagCompound());
-
-            if (createNewWorld)
-                world = new FakeWorld(worldInfo);
-
-            if (createNewWorld || (mcClient.thePlayer == null))
-            {
-                mcClient.thePlayer = new EntityPlayerSP(mcClient,world,new NetHandlerPlayClient(mcClient,mcClient.currentScreen,new NetworkManager(EnumPacketDirection.CLIENTBOUND),mcClient.getSession().getProfile()),null);
-                mcClient.thePlayer.dimension = 0;
-                mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
-                mcClient.thePlayer.eyeHeight = 1.82F;
-                setRandomMobItem(mcClient.thePlayer);
-            }
-
-            if (createNewWorld || (randMob == null))
-            {
-                if (MenuMobs.instance.allowDebugOutput)
-                {
-                    randMob = getNextEntity(world);
-                }
-                else
-                {
-                    randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
-                }
-                setRandomMobItem(randMob);
-            }
-
-            mcClient.getRenderManager().cacheActiveRenderInfo(world,mcClient.fontRendererObj,mcClient.thePlayer,mcClient.thePlayer,mcClient.gameSettings,0.0F);
-            savedScreen = mcClient.currentScreen;
-        }
-        catch (Throwable e)
-        {
-            LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
-            e.printStackTrace();
-            erroredOut = true;
-            mcClient.thePlayer = null;
-            randMob = null;
-            world = null;
-        }
-    }
-
-    private static EntityLivingBase getNextEntity(World world)
-    {
-        Class clazz;
-        int tries = 0;
-        do
-        {
-            if (++id >= entStrings.length)
-                id = 0;
-            clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
-            LogHelper.info(entStrings[id].toString());
-        }
-        while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
-
-        if (!EntityLivingBase.class.isAssignableFrom(clazz))
-        {
-            SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
-            return new EntityOtherPlayerMP(world, mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), false));
-        }
-
-        if (MenuMobs.instance.allowDebugOutput)
-            LogHelper.info(entStrings[id].toString());
-
-        return (EntityLivingBase) EntityList.createEntityByName((String) entStrings[id], world);
-    }
-
-    private static void setRandomMobItem(EntityLivingBase ent)
-    {
-        try
-        {
-            if (ent instanceof AbstractClientPlayer)
-                ent.setHeldItem(EnumHand.MAIN_HAND,playerItems[random.nextInt(playerItems.length)]);
-            else if (ent instanceof EntityZombie)
-                ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
-            else if (ent instanceof EntitySkeleton)
-            {
-                if (random.nextBoolean())
-                {
-                    ((EntitySkeleton) ent).setSkeletonType(1);
-                    ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-                }
-                else
-                    ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
-            }
-            else if (ent instanceof EntityPigZombie)
-                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-            else if (ent instanceof EntityEnderman)
-                ((EntityEnderman) ent).setHeldBlockState(Blocks.GRASS.getDefaultState());
-        }
-        catch (Throwable e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public void register()
-    {
-        if (!isRegistered)
-        {
-            LogHelper.info("Enabling Main Menu Mob render ticker");
-            FMLCommonHandler.instance().bus().register(this);
-            isRegistered = true;
-        }
-    }
-
-    public void unRegister()
-    {
-        if (isRegistered)
-        {
-            LogHelper.info("Disabling Main Menu Mob render ticker");
-            FMLCommonHandler.instance().bus().unregister(this);
-            isRegistered = false;
-            randMob = null;
-            world = null;
-            mcClient.thePlayer = null;
-        }
-    }
-
-    public boolean isRegistered()
-    {
-        return isRegistered;
-    }
-
-    static
-    {
+    static {
         entityBlacklist = new ArrayList();
         entityBlacklist.add("Mob");
         entityBlacklist.add("Monster");
@@ -349,16 +159,16 @@ public class BSMainMenuRenderTicker
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("7e6d65ed6fd840a786f8df09791572fc"), "Myrathi"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("b97e12cedbb14c0cafc8132b708a9b88"), "XCompWiz"));
 
-        playerItems = new ItemStack[] {
+        playerItems = new ItemStack[]{
                 new ItemStack(Items.IRON_SWORD), new ItemStack(Items.DIAMOND_SWORD), new ItemStack(Items.GOLDEN_SWORD),
                 new ItemStack(Items.DIAMOND_PICKAXE), new ItemStack(Items.IRON_PICKAXE), new ItemStack(Items.IRON_AXE)
         };
 
-        zombieItems = new ItemStack[] {
+        zombieItems = new ItemStack[]{
                 new ItemStack(Items.IRON_SWORD), new ItemStack(Items.DIAMOND_SWORD), new ItemStack(Items.GOLDEN_SWORD), new ItemStack(Items.IRON_AXE)
         };
 
-        skelItems = new ItemStack[] {
+        skelItems = new ItemStack[]{
                 new ItemStack(Items.BOW), new ItemStack(Items.GOLDEN_SWORD), new ItemStack(Items.BOW),
                 new ItemStack(Items.BOW), new ItemStack(Items.BOW), new ItemStack(Items.BOW)
         };
@@ -366,7 +176,419 @@ public class BSMainMenuRenderTicker
         // Get a COPY dumbass!
         entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
         entities.removeAll(entityBlacklist);
-        entStrings = entities.toArray(new Object[] {});
+        entStrings = entities.toArray(new Object[]{});
         id = -1;
+    }
+
+    private World world;
+    private EntityLivingBase randMob;
+    @SuppressWarnings("unused")
+    private GuiScreen savedScreen;
+
+
+    public BSMainMenuRenderTicker() {
+        mcClient = FMLClientHandler.instance().getClient();
+    }
+
+    private static EntityLivingBase getNextEntity(World world) {
+        Class clazz;
+        int tries = 0;
+        do {
+            if (++id >= entStrings.length)
+                id = 0;
+            clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
+            LogHelper.info(entStrings[id].toString());
+        }
+        while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
+
+        if (!EntityLivingBase.class.isAssignableFrom(clazz)) {
+            SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
+            return new EntityOtherPlayerMP(world, mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), false));
+        }
+
+        if (MenuMobs.instance.allowDebugOutput)
+            LogHelper.info(entStrings[id].toString());
+
+        return (EntityLivingBase) EntityList.createEntityByName((String) entStrings[id], world);
+    }
+
+    private static void setRandomMobItem(EntityLivingBase ent) {
+        try {
+            if (ent instanceof AbstractClientPlayer)
+                ent.setHeldItem(EnumHand.MAIN_HAND, playerItems[random.nextInt(playerItems.length)]);
+            else if (ent instanceof EntityZombie)
+                ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
+            else if (ent instanceof EntitySkeleton) {
+                if (random.nextBoolean()) {
+                    ((EntitySkeleton) ent).setSkeletonType(1);
+                    ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
+                } else
+                    ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
+            } else if (ent instanceof EntityPigZombie)
+                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
+            else if (ent instanceof EntityEnderman)
+                ((EntityEnderman) ent).setHeldBlockState(Blocks.GRASS.getDefaultState());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.RenderTickEvent event) {
+        if (Loader.isModLoaded("WorldStateCheckpoints"))// || Loader.isModLoaded("ExtraUtils2"))
+        {
+            MenuMobs.instance.showMainMenuMobs = false;
+            LogHelper.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints has been disabled for the remainder of this session.");
+            this.unRegister();
+        }
+
+        if (MenuMobs.instance.showMainMenuMobs && !erroredOut && (mcClient.currentScreen instanceof GuiMainMenu)) {
+            try {
+                if ((mcClient.thePlayer == null) || (mcClient.thePlayer.worldObj == null) || (randMob == null))
+                    init();
+
+                if ((world != null) && (mcClient.thePlayer != null) && (randMob != null)) {
+                    ScaledResolution sr = new ScaledResolution(mcClient);
+                    final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
+                    final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
+                    int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
+                    float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
+                    float scale = EntityUtils.getEntityScale(randMob, targetHeight, 1.8F);
+                    EntityUtils.drawEntityOnScreen(
+                            distanceToSide,
+                            (int) ((sr.getScaledHeight() / 2) + (randMob.height * scale)),
+                            scale,
+                            distanceToSide - mouseX,
+                            ((sr.getScaledHeight() / 2) + (randMob.height * scale)) - (randMob.height * scale * (randMob.getEyeHeight() / randMob.height)) - mouseY,
+                            randMob);
+                    EntityUtils.drawEntityOnScreen(
+                            sr.getScaledWidth() - distanceToSide,
+                            (int) ((sr.getScaledHeight() / 2) + (mcClient.thePlayer.height * targetHeight)),
+                            targetHeight,
+                            sr.getScaledWidth() - distanceToSide - mouseX,
+                            ((sr.getScaledHeight() / 2) + (mcClient.thePlayer.height * targetHeight)) - (mcClient.thePlayer.height * targetHeight * (mcClient.thePlayer.getEyeHeight() / mcClient.thePlayer.height)) - mouseY,
+                            mcClient.thePlayer);
+                }
+            } catch (Throwable e) {
+                LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
+                e.printStackTrace();
+                erroredOut = true;
+                mcClient.thePlayer = null;
+                randMob = null;
+                world = null;
+            }
+        }
+    }
+
+    private void init() {
+        try {
+            boolean createNewWorld = world == null;
+            WorldInfo worldInfo = new WorldInfo(new NBTTagCompound());
+
+            if (createNewWorld)
+                world = new FakeWorld(worldInfo);
+
+            if (createNewWorld || (mcClient.thePlayer == null)) {
+                mcClient.thePlayer = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new NetworkManager(EnumPacketDirection.CLIENTBOUND) {
+                    @Override
+                    public Channel channel() {
+                        return new Channel() {
+                            @Override
+                            public EventLoop eventLoop() {
+                                return null;
+                            }
+
+                            @Override
+                            public Channel parent() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelConfig config() {
+                                return null;
+                            }
+
+                            @Override
+                            public boolean isOpen() {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean isRegistered() {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean isActive() {
+                                return false;
+                            }
+
+                            @Override
+                            public ChannelMetadata metadata() {
+                                return null;
+                            }
+
+                            @Override
+                            public SocketAddress localAddress() {
+                                return null;
+                            }
+
+                            @Override
+                            public SocketAddress remoteAddress() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture closeFuture() {
+                                return null;
+                            }
+
+                            @Override
+                            public boolean isWritable() {
+                                return false;
+                            }
+
+                            @Override
+                            public Unsafe unsafe() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelPipeline pipeline() {
+                                return null;
+                            }
+
+                            @Override
+                            public ByteBufAllocator alloc() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelPromise newPromise() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelProgressivePromise newProgressivePromise() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture newSucceededFuture() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture newFailedFuture(Throwable cause) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelPromise voidPromise() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture bind(SocketAddress localAddress) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture connect(SocketAddress remoteAddress) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture disconnect() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture close() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture deregister() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture bind(SocketAddress localAddress, ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture connect(SocketAddress remoteAddress, ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture disconnect(ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture close(ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture deregister(ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public Channel read() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture write(Object msg) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture write(Object msg, ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public Channel flush() {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture writeAndFlush(Object msg, ChannelPromise promise) {
+                                return null;
+                            }
+
+                            @Override
+                            public ChannelFuture writeAndFlush(Object msg) {
+                                return null;
+                            }
+
+                            @Override
+                            public <T> Attribute<T> attr(AttributeKey<T> key) {
+                                return new Attribute<T>() {
+                                    @Override
+                                    public int hashCode() {
+                                        return super.hashCode();
+                                    }
+
+                                    @Override
+                                    public T setIfAbsent(T value) {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public T getAndSet(T value) {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public AttributeKey<T> key() {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public T getAndRemove() {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public void remove() {
+
+                                    }
+
+                                    @Override
+                                    public T get() {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public boolean compareAndSet(T oldValue, T newValue) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public void set(T value) {
+
+                                    }
+                                };
+                            }
+
+                            @Override
+                            public int compareTo(Channel o) {
+                                return 0;
+                            }
+                        };
+                    }
+                }, mcClient.getSession().getProfile()), null);
+                mcClient.thePlayer.dimension = 0;
+                mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
+                mcClient.thePlayer.eyeHeight = 1.82F;
+                setRandomMobItem(mcClient.thePlayer);
+            }
+
+            if (createNewWorld || (randMob == null)) {
+                if (MenuMobs.instance.allowDebugOutput) {
+                    randMob = getNextEntity(world);
+                } else {
+                    randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
+                }
+                setRandomMobItem(randMob);
+            }
+
+            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, mcClient.thePlayer, mcClient.gameSettings, 0.0F);
+            savedScreen = mcClient.currentScreen;
+        } catch (Throwable e) {
+            LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
+            e.printStackTrace();
+            erroredOut = true;
+            mcClient.thePlayer = null;
+            randMob = null;
+            world = null;
+        }
+    }
+
+    public void register() {
+        if (!isRegistered) {
+            LogHelper.info("Enabling Main Menu Mob render ticker");
+//            NetworkManager clientConnection = FMLCommonHandler.instance().getClientToServerNetworkManager();
+//            ImmutableList.of(
+//                    clientConnection
+//                            .channel()
+//                            .attr(
+//                                    NetworkDispatcher.FML_DISPATCHER)
+//                            .get());
+            FMLCommonHandler.instance().bus().register(this);
+            isRegistered = true;
+        }
+    }
+
+    public void unRegister() {
+        if (isRegistered) {
+            LogHelper.info("Disabling Main Menu Mob render ticker");
+            FMLCommonHandler.instance().bus().unregister(this);
+            isRegistered = false;
+            randMob = null;
+            world = null;
+            mcClient.thePlayer = null;
+        }
+    }
+
+    public boolean isRegistered() {
+        return isRegistered;
     }
 }

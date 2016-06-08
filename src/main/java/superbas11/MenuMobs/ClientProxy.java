@@ -8,20 +8,17 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ClientProxy extends CommonProxy
-{
+public class ClientProxy extends CommonProxy {
     private BSMainMenuRenderTicker mainMenuTicker;
 
     @Override
-    protected void registerMainMenuTickHandler()
-    {
+    protected void registerMainMenuTickHandler() {
         mainMenuTicker = new BSMainMenuRenderTicker();
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
-    public void onGuiOpen(GuiOpenEvent event)
-    {
+    public void onGuiOpen(GuiOpenEvent event) {
         if (MenuMobs.instance.showMainMenuMobs)
             if ((event.getGui() instanceof GuiMainMenu) && !mainMenuTicker.isRegistered())
                 mainMenuTicker.register();

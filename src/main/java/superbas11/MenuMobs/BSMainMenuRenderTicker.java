@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -42,6 +43,7 @@ import superbas11.MenuMobs.client.util.EntityUtils;
 import superbas11.MenuMobs.util.FakeWorld;
 import superbas11.MenuMobs.util.LogHelper;
 
+import javax.annotation.Nullable;
 import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
@@ -193,17 +195,26 @@ public class BSMainMenuRenderTicker {
     private static EntityLivingBase getNextEntity(World world) {
         Class clazz;
         int tries = 0;
+        final NetworkPlayerInfo networkPlayerInfo;
+        GameProfile gameProfile;
         do {
             if (++id >= entStrings.length)
                 id = 0;
             clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
-            LogHelper.info(entStrings[id].toString());
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
 
         if (!EntityLivingBase.class.isAssignableFrom(clazz)) {
-            SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
-            return new EntityOtherPlayerMP(world, mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), false));
+            final SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
+            gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
+            networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
+            return new EntityOtherPlayerMP(world, gameProfile) {
+                @Nullable
+                @Override
+                protected NetworkPlayerInfo getPlayerInfo() {
+                    return networkPlayerInfo;
+                }
+            };
         }
 
         if (MenuMobs.instance.allowDebugOutput)
@@ -534,7 +545,18 @@ public class BSMainMenuRenderTicker {
                             }
                         };
                     }
-                }, mcClient.getSession().getProfile()), null);
+                }, mcClient.getSession().getProfile()) {
+                    @Override
+                    public NetworkPlayerInfo getPlayerInfo(UUID uniqueId) {
+                        return new NetworkPlayerInfo(mcClient.getSession().getProfile());
+                    }
+
+                    @Nullable
+                    @Override
+                    public NetworkPlayerInfo getPlayerInfo(String name) {
+                        return new NetworkPlayerInfo(mcClient.getSession().getProfile());
+                    }
+                }, null);
                 mcClient.thePlayer.dimension = 0;
                 mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
                 mcClient.thePlayer.eyeHeight = 1.82F;

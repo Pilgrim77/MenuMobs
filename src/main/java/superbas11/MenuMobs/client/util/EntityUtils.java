@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
@@ -16,6 +17,7 @@ import net.minecraft.world.World;
 import superbas11.MenuMobs.MenuMobs;
 import superbas11.MenuMobs.util.LogHelper;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
@@ -198,6 +200,9 @@ public class EntityUtils {
                                                          List blacklist, int numberOfAttempts,
                                                          List<SimpleEntry<UUID, String>> fallbackPlayerNames) {
         Random random = new Random();
+        final NetworkPlayerInfo networkPlayerInfo;
+        GameProfile gameProfile;
+        Minecraft mcClient = Minecraft.getMinecraft();
         // Get a COPY dumbass!
         Set entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
 
@@ -218,14 +223,16 @@ public class EntityUtils {
 
         if (!EntityLivingBase.class.isAssignableFrom(clazz)) {
             if (fallbackPlayerNames != null) {
-                SimpleEntry<UUID, String> entry = fallbackPlayerNames
-                        .get(random.nextInt(fallbackPlayerNames.size()));
-                return new EntityOtherPlayerMP(world, Minecraft
-                        .getMinecraft()
-                        .getSessionService()
-                        .fillProfileProperties(
-                                new GameProfile(entry.getKey(),
-                                        entry.getValue()), true));
+                SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
+                gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
+                networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
+                return new EntityOtherPlayerMP(world, gameProfile) {
+                    @Nullable
+                    @Override
+                    protected NetworkPlayerInfo getPlayerInfo() {
+                        return networkPlayerInfo;
+                    }
+                };
             } else
                 return (EntityLivingBase) EntityList.createEntityByName(
                         "Chicken", world);

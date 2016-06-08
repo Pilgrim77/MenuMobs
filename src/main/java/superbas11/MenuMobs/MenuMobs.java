@@ -19,23 +19,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mod(modid = Reference.MODID, name = Reference.NAME, version = "@MOD_VERSION@", useMetadata = true, guiFactory = Reference.GUI_FACTORY)
-public class MenuMobs
-{
-    public boolean              allowDebugOutput                 = false;
-    public boolean              showMainMenuMobs                 = true;
-
+public class MenuMobs {
     @Metadata(value = Reference.MODID)
-    public static ModMetadata   metadata;
-
+    public static ModMetadata metadata;
     @Instance(value = Reference.MODID)
     public static MenuMobs instance;
-
     @SidedProxy(clientSide = Reference.PROXY_CLIENT, serverSide = Reference.PROXY_COMMON)
-    public static CommonProxy   proxy;
+    public static CommonProxy proxy;
+    public boolean allowDebugOutput = false;
+    public boolean showMainMenuMobs = true;
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         metadata = event.getModMetadata();
 
         File file = event.getSuggestedConfigurationFile();
@@ -45,8 +40,7 @@ public class MenuMobs
         syncConfig();
     }
 
-    public void syncConfig()
-    {
+    public void syncConfig() {
         String ctgyGen = Configuration.CATEGORY_GENERAL;
         Reference.config.load();
 
@@ -69,22 +63,18 @@ public class MenuMobs
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+    public void init(FMLInitializationEvent event) {
         FMLCommonHandler.instance().bus().register(instance);
     }
 
     @EventHandler
-    public void postInit(FMLPostInitializationEvent event)
-    {
+    public void postInit(FMLPostInitializationEvent event) {
         proxy.registerMainMenuTickHandler();
     }
 
     @SubscribeEvent
-    public void onConfigChanged(OnConfigChangedEvent event)
-    {
-        if (event.getModID().equals(Reference.MODID))
-        {
+    public void onConfigChanged(OnConfigChangedEvent event) {
+        if (event.getModID().equals(Reference.MODID)) {
             Reference.config.save();
             syncConfig();
         }

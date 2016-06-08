@@ -14,75 +14,70 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
 import superbas11.MenuMobs.MenuMobs;
-import superbas11.util.LogHelper;
+import superbas11.MenuMobs.util.LogHelper;
 
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
-public class EntityUtils
-{
+public class EntityUtils {
     // @formatter:off
-	/**
-	 * <hipsterpig> i have some idea how to <hipsterpig> but it's too
-	 * complicated for me to bother with <hipsterpig> i'll have to sketch it on
-	 * a piece of paper for me to get it just right <hipsterpig> okay so first
-	 * off you need to take note of the how large/squishy the renderer is
-	 * scaling the model, that's done in preRenderCallback of the renderer,
-	 * protected iirc so you have to reflect in <hipsterpig> then you need to go
-	 * through the list of ModelRenderer in the mainModel class and set the
-	 * compiled field in all of them to false <hipsterpig> force the model to
-	 * render so that pieces of the model that will actually render will set the
-	 * compiled field back to true <hipsterpig> gather all these ModelRenderer
-	 * vars in said list, then you hav to go through their ModelBox list, find
-	 * out their size and relative position on the ModelRenderer to find the
-	 * outermost ModelBoxes in the XYZ axises <hipsterpig> then from there you
-	 * have your width, height, and length.. as well as how much the renderer
-	 * scales the model <hipsterpig> now the problem here is there are some
-	 * unique models, in vanilla alone. one being the enderdragon, another being
-	 * the villager zombie, just off the top of my mind <hipsterpig> ender
-	 * dragon only has a half of the body as a model, the other half is
-	 * reflected while rendering, and the model itself is rotated 180
-	 * <hipsterpig> for the villager zombie, when it's being rendered it doesn't
-	 * set the mainModel as the villager zombie's model, so if you pull the
-	 * mainModel out of the RenderLivingEntity and try to render that to get
-	 * the compiled ModelRenderers, it'll turn up with nothing <hipsterpig> if
-	 * you ask why i do that compile check, horse models. <hipsterpig> horse
-	 * models have horse, donkey, mule, armor, chest, all in one model, and in
-	 * one big cluttered mess <superbas11> would renderPassModel work? <hipsterpig>
-	 * i've never looked at renderPassModel. I assumed renderPassModel would be
-	 * null for a lot mod entities, especially custom mobs with no armor equip
-	 * <hipsterpig> but.. that poi also never looked how minecraft swaps
-	 * villager zombies properly <hipsterpig> superbas11: heh, <hipsterpig> but it's
-	 * too complicated for me to bother with <superbas11> yep <superbas11> seems like it
-	 * shouldn't be too hard, but then it is <hipsterpig> oh right <hipsterpig>
-	 * i forgot to tell you <hipsterpig> ModelBox doesn't actually store itself
-	 * as dimensions <hipsterpig> it stores x1 and x2 coords <hipsterpig> so you
-	 * need to get the Math.abs the difference to get the size of each axis,
-	 * then round it off to int <hipsterpig> and the texture vertex of the cubes
-	 * are defined by the texture offsets of the parent ModelRenderer, which
-	 * could change in between ModelBox creation in the same ModelRenderer, so
-	 * you have to calculate the texture offsets manually if you want to do
-	 * something texture related with ModelBox (this isn't related to what
-	 * you're asking)
-	 */
-	// @formatter:on
-    public static float getModelSize(EntityLivingBase ent)
-    {
+
+    /**
+     * <hipsterpig> i have some idea how to <hipsterpig> but it's too
+     * complicated for me to bother with <hipsterpig> i'll have to sketch it on
+     * a piece of paper for me to get it just right <hipsterpig> okay so first
+     * off you need to take note of the how large/squishy the renderer is
+     * scaling the model, that's done in preRenderCallback of the renderer,
+     * protected iirc so you have to reflect in <hipsterpig> then you need to go
+     * through the list of ModelRenderer in the mainModel class and set the
+     * compiled field in all of them to false <hipsterpig> force the model to
+     * render so that pieces of the model that will actually render will set the
+     * compiled field back to true <hipsterpig> gather all these ModelRenderer
+     * vars in said list, then you hav to go through their ModelBox list, find
+     * out their size and relative position on the ModelRenderer to find the
+     * outermost ModelBoxes in the XYZ axises <hipsterpig> then from there you
+     * have your width, height, and length.. as well as how much the renderer
+     * scales the model <hipsterpig> now the problem here is there are some
+     * unique models, in vanilla alone. one being the enderdragon, another being
+     * the villager zombie, just off the top of my mind <hipsterpig> ender
+     * dragon only has a half of the body as a model, the other half is
+     * reflected while rendering, and the model itself is rotated 180
+     * <hipsterpig> for the villager zombie, when it's being rendered it doesn't
+     * set the mainModel as the villager zombie's model, so if you pull the
+     * mainModel out of the RenderLivingEntity and try to render that to get
+     * the compiled ModelRenderers, it'll turn up with nothing <hipsterpig> if
+     * you ask why i do that compile check, horse models. <hipsterpig> horse
+     * models have horse, donkey, mule, armor, chest, all in one model, and in
+     * one big cluttered mess <superbas11> would renderPassModel work? <hipsterpig>
+     * i've never looked at renderPassModel. I assumed renderPassModel would be
+     * null for a lot mod entities, especially custom mobs with no armor equip
+     * <hipsterpig> but.. that poi also never looked how minecraft swaps
+     * villager zombies properly <hipsterpig> superbas11: heh, <hipsterpig> but it's
+     * too complicated for me to bother with <superbas11> yep <superbas11> seems like it
+     * shouldn't be too hard, but then it is <hipsterpig> oh right <hipsterpig>
+     * i forgot to tell you <hipsterpig> ModelBox doesn't actually store itself
+     * as dimensions <hipsterpig> it stores x1 and x2 coords <hipsterpig> so you
+     * need to get the Math.abs the difference to get the size of each axis,
+     * then round it off to int <hipsterpig> and the texture vertex of the cubes
+     * are defined by the texture offsets of the parent ModelRenderer, which
+     * could change in between ModelBox creation in the same ModelRenderer, so
+     * you have to calculate the texture offsets manually if you want to do
+     * something texture related with ModelBox (this isn't related to what
+     * you're asking)
+     */
+    // @formatter:on
+    public static float getModelSize(EntityLivingBase ent) {
         Render render = Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(ent);
-        if (render instanceof RenderLivingBase)
-        {
+        if (render instanceof RenderLivingBase) {
             RenderLivingBase entRender = (RenderLivingBase) render;
             ModelBase mainModel;
             ModelBase renderPassModel;
-            try
-            {
+            try {
                 Field mainModelField;
                 Field renderPassModelField;
 
-            }
-            catch (Throwable e)
-            {
+            } catch (Throwable e) {
 
             }
         }
@@ -142,8 +137,7 @@ public class EntityUtils
     //        }
     //    }
 
-    public static void drawEntityOnScreen(int posX, int posY, float scale, float mouseX, float mouseY, EntityLivingBase ent)
-    {
+    public static void drawEntityOnScreen(int posX, int posY, float scale, float mouseX, float mouseY, EntityLivingBase ent) {
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
@@ -169,16 +163,13 @@ public class EntityUtils
         ent.rotationYawHead = ent.rotationYaw;
         ent.prevRotationYawHead = ent.rotationYaw;
         GlStateManager.translate(0.0F, 0.0F, 0.0F);
-        try
-        {
+        try {
             RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
             rendermanager.setPlayerViewY(180.0F);
             rendermanager.setRenderShadow(false);
             rendermanager.doRenderEntity(ent, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, true);
             rendermanager.setRenderShadow(true);
-        }
-        finally
-        {
+        } finally {
             ent.renderYawOffset = f2;
             ent.rotationYaw = f3;
             ent.rotationPitch = f4;
@@ -194,21 +185,18 @@ public class EntityUtils
         }
     }
 
-    public static float getEntityScale(EntityLivingBase ent, float baseScale, float targetHeight)
-    {
+    public static float getEntityScale(EntityLivingBase ent, float baseScale, float targetHeight) {
         return (targetHeight / Math.max(ent.width, ent.height)) * baseScale;
     }
 
-    public static EntityLivingBase getRandomLivingEntity(World world)
-    {
+    public static EntityLivingBase getRandomLivingEntity(World world) {
         return getRandomLivingEntity(world, null, 5, null);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static EntityLivingBase getRandomLivingEntity(World world,
-            List blacklist, int numberOfAttempts,
-            List<SimpleEntry<UUID, String>> fallbackPlayerNames)
-    {
+                                                         List blacklist, int numberOfAttempts,
+                                                         List<SimpleEntry<UUID, String>> fallbackPlayerNames) {
         Random random = new Random();
         // Get a COPY dumbass!
         Set entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
@@ -216,23 +204,20 @@ public class EntityUtils
         if (blacklist != null)
             entities.removeAll(blacklist);
 
-        Object[] entStrings = entities.toArray(new Object[] {});
+        Object[] entStrings = entities.toArray(new Object[]{});
         int id;
         Class clazz;
 
         int tries = 0;
-        do
-        {
+        do {
             id = random.nextInt(entStrings.length);
             clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz)
                 && (++tries <= numberOfAttempts));
 
-        if (!EntityLivingBase.class.isAssignableFrom(clazz))
-        {
-            if (fallbackPlayerNames != null)
-            {
+        if (!EntityLivingBase.class.isAssignableFrom(clazz)) {
+            if (fallbackPlayerNames != null) {
                 SimpleEntry<UUID, String> entry = fallbackPlayerNames
                         .get(random.nextInt(fallbackPlayerNames.size()));
                 return new EntityOtherPlayerMP(world, Minecraft
@@ -241,8 +226,7 @@ public class EntityUtils
                         .fillProfileProperties(
                                 new GameProfile(entry.getKey(),
                                         entry.getValue()), true));
-            }
-            else
+            } else
                 return (EntityLivingBase) EntityList.createEntityByName(
                         "Chicken", world);
         }

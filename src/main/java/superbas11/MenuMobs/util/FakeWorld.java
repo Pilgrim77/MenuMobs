@@ -3,8 +3,6 @@ package superbas11.MenuMobs.util;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
@@ -13,7 +11,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -33,16 +30,13 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.client.IRenderHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Provides a fake world that can be used to render entities in client-side GUIs without a world actually running.
@@ -51,15 +45,8 @@ import java.util.Random;
  */
 public class FakeWorld extends World {
     public FakeWorld(WorldInfo worldInfo) {
-//        super(new FakeSaveHandler(), "", new FakeWorldProvider(), new WorldSettings(new WorldInfo(new NBTTagCompound())), null);
-//        this.difficultySetting = EnumDifficulty.HARD;
         super(new FakeSaveHandler(), worldInfo, new FakeWorldProvider(), new Profiler(), true);
     }
-
-//    @Override
-//    public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
-//        return new BiomeGenPlains(false, (new BiomeGenBase.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
-//    }
 
     @Override
     public Biome getBiomeGenForCoords(BlockPos pos) {
@@ -87,29 +74,10 @@ public class FakeWorld extends World {
         return pos.getY() > 63;
     }
 
-//    @Override
-//    public boolean doChunksNearChunkExist(int par1, int par2, int par3, int par4)
-//    {
-//        return false;
-//    }
-
-//    @Override
-//    public boolean checkChunksExist(int par1, int par2, int par3, int par4, int par5, int par6)
-//    {
-//        return false;
-//    }
-
-
     @Override
     public boolean setBlockState(BlockPos pos, IBlockState newState, int flags) {
         return super.setBlockState(pos, newState, flags);
     }
-
-//    @Override
-//    public int getBlockMetadata(int x, int y, int z)
-//    {
-//        return 0;
-//    }
 
     @Override
     public IBlockState getBlockState(BlockPos pos) {
@@ -126,29 +94,9 @@ public class FakeWorld extends World {
         return true;
     }
 
-//    @Override
-//    public boolean breakBlock(int x, int y, int z, boolean p_147480_4_)
-//    {
-//        return this.isAirBlock(x, y, z);
-//    }
-
-//    @Override
-//    public boolean setBlock(int x, int y, int z, Block p_147449_4_)
-//    {
-//        return true;
-//    }
-
-//    @Override
-//    public void markBlockForUpdate(int p_147471_1_, int p_147471_2_, int p_147471_3_)
-//    {}
-
     @Override
     public void markChunkDirty(BlockPos pos, TileEntity unusedTileEntity) {
     }
-
-//    @Override
-//    public void notifyBlockChange(int p_147444_1_, int p_147444_2_, int p_147444_3_, Block p_147444_4_)
-//    {}
 
     @Override
     public void notifyBlockUpdate(BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
@@ -242,7 +190,6 @@ public class FakeWorld extends World {
     public void setLightFor(EnumSkyBlock type, BlockPos pos, int lightValue) {
     }
 
-
     @Override
     public boolean isDaytime() {
         return true;
@@ -286,7 +233,6 @@ public class FakeWorld extends World {
     public RayTraceResult rayTraceBlocks(Vec3d vec31, Vec3d vec32, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock) {
         return null;
     }
-
 
     @Override
     public boolean addWeatherEffect(Entity par1Entity) {
@@ -352,18 +298,9 @@ public class FakeWorld extends World {
         return super.getStarBrightnessBody(par1);
     }
 
-//    @Override
-//    public void func_147446_b(int p_147446_1_, int p_147446_2_, int p_147446_3_, Block p_147446_4_, int p_147446_5_, int p_147446_6_)
-//    {}
-
     @Override
     public void updateEntities() {
     }
-
-//    @SuppressWarnings("rawtypes")
-//    @Override
-//    public void func_147448_a(Collection p_147448_1_)
-//    {}
 
     @Override
     public void updateEntity(Entity par1Entity) {
@@ -495,15 +432,6 @@ public class FakeWorld extends World {
     public void updateWeatherBody() {
     }
 
-//    @Override
-//    protected void func_147467_a(int p_147467_1_, int p_147467_2_, Chunk p_147467_3_)
-//    {}
-//
-//    @Override
-//    protected void func_147456_g()
-//    {}
-
-
     @Override
     public boolean canBlockFreezeWater(BlockPos pos) {
         return false;
@@ -533,18 +461,6 @@ public class FakeWorld extends World {
     public boolean canSnowAtBody(BlockPos pos, boolean checkLight) {
         return false;
     }
-
-//    @Override
-//    public boolean updateAllLightTypes(int p_147451_1_, int p_147451_2_, int p_147451_3_)
-//    {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean updateLightByType(EnumSkyBlock p_147463_1_, int p_147463_2_, int p_147463_3_, int p_147463_4_)
-//    {
-//        return false;
-//    }
 
     @Override
     public boolean tickUpdates(boolean par1) {
@@ -761,17 +677,6 @@ public class FakeWorld extends World {
     public void setItemData(String par1Str, WorldSavedData par2WorldSavedData) {
     }
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public WorldSavedData loadItemData(Class par1Class, String par2Str) {
-        return super.loadItemData(par1Class, par2Str);
-    }
-
-    @Override
-    public int getUniqueDataId(String par1Str) {
-        return super.getUniqueDataId(par1Str);
-    }
-
     @Override
     public void playBroadcastSound(int p_175669_1_, BlockPos pos, int p_175669_3_) {
     }
@@ -795,11 +700,6 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public Random setRandomSeed(int par1, int par2, int par3) {
-        return super.setRandomSeed(par1, par2, par3);
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
     public boolean extendedLevelsInChunkCache() {
         return false;
@@ -807,28 +707,7 @@ public class FakeWorld extends World {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public double getHorizon() {
-        return super.getHorizon();
-    }
-
-    @Override
-    public CrashReportCategory addWorldInfoToCrashReport(CrashReport par1CrashReport) {
-        return super.addWorldInfoToCrashReport(par1CrashReport);
-    }
-
-    @Override
-    public Calendar getCurrentDate() {
-        return super.getCurrentDate();
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
     public void makeFireworks(double par1, double par3, double par5, double par7, double par9, double par11, NBTTagCompound par13nbtTagCompound) {
-    }
-
-    @Override
-    public Scoreboard getScoreboard() {
-        return super.getScoreboard();
     }
 
     @Override
@@ -871,6 +750,7 @@ public class FakeWorld extends World {
     }
 
     protected static class FakeWorldProvider extends WorldProvider {
+
         @Override
         public DimensionType getDimensionType() {
             return DimensionType.OVERWORLD;
@@ -898,12 +778,6 @@ public class FakeWorld extends World {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public double getVoidFogYFactor() {
-            return super.getVoidFogYFactor();
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
         public boolean doesXZShowFog(int par1, int par2) {
             return false;
         }
@@ -925,47 +799,6 @@ public class FakeWorld extends World {
         @Override
         public String getDepartMessage() {
             return "";
-        }
-
-        @Override
-        public double getMovementFactor() {
-            return super.getMovementFactor();
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public IRenderHandler getSkyRenderer() {
-            return super.getSkyRenderer();
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public void setSkyRenderer(IRenderHandler skyRenderer) {
-            super.setSkyRenderer(skyRenderer);
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public IRenderHandler getCloudRenderer() {
-            return super.getCloudRenderer();
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public void setCloudRenderer(IRenderHandler renderer) {
-            super.setCloudRenderer(renderer);
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public IRenderHandler getWeatherRenderer() {
-            return super.getWeatherRenderer();
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public void setWeatherRenderer(IRenderHandler renderer) {
-            super.setWeatherRenderer(renderer);
         }
 
         @Override
@@ -1053,11 +886,6 @@ public class FakeWorld extends World {
         @Override
         public int getActualHeight() {
             return 256;
-        }
-
-        @Override
-        public double getHorizon() {
-            return super.getHorizon();
         }
 
         @Override

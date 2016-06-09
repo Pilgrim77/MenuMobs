@@ -2,10 +2,6 @@ package superbas11.MenuMobs;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.*;
-import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
@@ -26,13 +22,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.EnumPacketDirection;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MovementInputFromOptions;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -40,11 +35,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import superbas11.MenuMobs.client.util.EntityUtils;
+import superbas11.MenuMobs.util.FakeNetworkManager;
 import superbas11.MenuMobs.util.FakeWorld;
 import superbas11.MenuMobs.util.LogHelper;
 
 import javax.annotation.Nullable;
-import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
@@ -216,7 +211,6 @@ public class BSMainMenuRenderTicker {
                 }
             };
         }
-
         if (MenuMobs.instance.allowDebugOutput)
             LogHelper.info(entStrings[id].toString());
 
@@ -246,8 +240,7 @@ public class BSMainMenuRenderTicker {
 
     @SubscribeEvent
     public void onTick(TickEvent.RenderTickEvent event) {
-        if (Loader.isModLoaded("WorldStateCheckpoints"))// || Loader.isModLoaded("ExtraUtils2"))
-        {
+        if (Loader.isModLoaded("WorldStateCheckpoints")) {
             MenuMobs.instance.showMainMenuMobs = false;
             LogHelper.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints has been disabled for the remainder of this session.");
             this.unRegister();
@@ -300,252 +293,7 @@ public class BSMainMenuRenderTicker {
                 world = new FakeWorld(worldInfo);
 
             if (createNewWorld || (mcClient.thePlayer == null)) {
-                mcClient.thePlayer = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new NetworkManager(EnumPacketDirection.CLIENTBOUND) {
-                    @Override
-                    public Channel channel() {
-                        return new Channel() {
-                            @Override
-                            public EventLoop eventLoop() {
-                                return null;
-                            }
-
-                            @Override
-                            public Channel parent() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelConfig config() {
-                                return null;
-                            }
-
-                            @Override
-                            public boolean isOpen() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isRegistered() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isActive() {
-                                return false;
-                            }
-
-                            @Override
-                            public ChannelMetadata metadata() {
-                                return null;
-                            }
-
-                            @Override
-                            public SocketAddress localAddress() {
-                                return null;
-                            }
-
-                            @Override
-                            public SocketAddress remoteAddress() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture closeFuture() {
-                                return null;
-                            }
-
-                            @Override
-                            public boolean isWritable() {
-                                return false;
-                            }
-
-                            @Override
-                            public Unsafe unsafe() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelPipeline pipeline() {
-                                return null;
-                            }
-
-                            @Override
-                            public ByteBufAllocator alloc() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelPromise newPromise() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelProgressivePromise newProgressivePromise() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture newSucceededFuture() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture newFailedFuture(Throwable cause) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelPromise voidPromise() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture bind(SocketAddress localAddress) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture connect(SocketAddress remoteAddress) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture disconnect() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture close() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture deregister() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture bind(SocketAddress localAddress, ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture connect(SocketAddress remoteAddress, ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture disconnect(ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture close(ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture deregister(ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public Channel read() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture write(Object msg) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture write(Object msg, ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public Channel flush() {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture writeAndFlush(Object msg, ChannelPromise promise) {
-                                return null;
-                            }
-
-                            @Override
-                            public ChannelFuture writeAndFlush(Object msg) {
-                                return null;
-                            }
-
-                            @Override
-                            public <T> Attribute<T> attr(AttributeKey<T> key) {
-                                return new Attribute<T>() {
-                                    @Override
-                                    public int hashCode() {
-                                        return super.hashCode();
-                                    }
-
-                                    @Override
-                                    public T setIfAbsent(T value) {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public T getAndSet(T value) {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public AttributeKey<T> key() {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public T getAndRemove() {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public void remove() {
-
-                                    }
-
-                                    @Override
-                                    public T get() {
-                                        return null;
-                                    }
-
-                                    @Override
-                                    public boolean compareAndSet(T oldValue, T newValue) {
-                                        return false;
-                                    }
-
-                                    @Override
-                                    public void set(T value) {
-
-                                    }
-                                };
-                            }
-
-                            @Override
-                            public int compareTo(Channel o) {
-                                return 0;
-                            }
-                        };
-                    }
-                }, mcClient.getSession().getProfile()) {
+                mcClient.thePlayer = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
                     @Override
                     public NetworkPlayerInfo getPlayerInfo(UUID uniqueId) {
                         return new NetworkPlayerInfo(mcClient.getSession().getProfile());
@@ -587,14 +335,7 @@ public class BSMainMenuRenderTicker {
     public void register() {
         if (!isRegistered) {
             LogHelper.info("Enabling Main Menu Mob render ticker");
-//            NetworkManager clientConnection = FMLCommonHandler.instance().getClientToServerNetworkManager();
-//            ImmutableList.of(
-//                    clientConnection
-//                            .channel()
-//                            .attr(
-//                                    NetworkDispatcher.FML_DISPATCHER)
-//                            .get());
-            FMLCommonHandler.instance().bus().register(this);
+            MinecraftForge.EVENT_BUS.register(this);
             isRegistered = true;
         }
     }
@@ -602,7 +343,7 @@ public class BSMainMenuRenderTicker {
     public void unRegister() {
         if (isRegistered) {
             LogHelper.info("Disabling Main Menu Mob render ticker");
-            FMLCommonHandler.instance().bus().unregister(this);
+            MinecraftForge.EVENT_BUS.unregister(this);
             isRegistered = false;
             randMob = null;
             world = null;

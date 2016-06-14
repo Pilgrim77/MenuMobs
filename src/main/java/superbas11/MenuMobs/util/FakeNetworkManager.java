@@ -206,11 +206,6 @@ public class FakeNetworkManager extends NetworkManager {
             public <T> Attribute<T> attr(AttributeKey<T> key) {
                 return new Attribute<T>() {
                     @Override
-                    public int hashCode() {
-                        return super.hashCode();
-                    }
-
-                    @Override
                     public T setIfAbsent(T value) {
                         return null;
                     }
@@ -232,7 +227,6 @@ public class FakeNetworkManager extends NetworkManager {
 
                     @Override
                     public void remove() {
-
                     }
 
                     @Override

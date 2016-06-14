@@ -68,6 +68,13 @@ processResources {
     }
 }
 
+// Add Access Transformers Manifest
+jar {
+    manifest {
+        attributes 'FMLAT': 'MenuMobs_at.cfg'
+    }
+}
+
 // change the name of my obfuscated jar
 jar {
     appendix = config.appendix

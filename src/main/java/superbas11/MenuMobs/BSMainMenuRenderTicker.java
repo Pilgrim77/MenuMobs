@@ -2,6 +2,8 @@ package superbas11.MenuMobs;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
@@ -17,7 +19,6 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -221,18 +222,21 @@ public class BSMainMenuRenderTicker {
         try {
             if (ent instanceof AbstractClientPlayer)
                 ent.setHeldItem(EnumHand.MAIN_HAND, playerItems[random.nextInt(playerItems.length)]);
-            else if (ent instanceof EntityZombie)
-                ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
+            else if (ent instanceof EntityPigZombie)
+                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
             else if (ent instanceof EntitySkeleton) {
                 if (random.nextBoolean()) {
                     ((EntitySkeleton) ent).setSkeletonType(1);
                     ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
                 } else
                     ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
-            } else if (ent instanceof EntityPigZombie)
-                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-            else if (ent instanceof EntityEnderman)
-                ((EntityEnderman) ent).setHeldBlockState(Blocks.GRASS.getDefaultState());
+            } else if (ent instanceof EntityZombie)
+                ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
+            else if (ent instanceof EntityEnderman) {
+                Object[] blocks = EntityEnderman.CARRIABLE_BLOCKS.toArray();
+                IBlockState block = ((Block) blocks[random.nextInt(blocks.length)]).getDefaultState();
+                ((EntityEnderman) ent).setHeldBlockState(block);
+            }
         } catch (Throwable e) {
             e.printStackTrace();
         }

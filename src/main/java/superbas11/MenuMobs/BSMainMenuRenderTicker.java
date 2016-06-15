@@ -9,7 +9,6 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -55,8 +54,7 @@ public class BSMainMenuRenderTicker {
     private static ItemStack[] zombieItems;
     private static ItemStack[] skelItems;
     private static Random random = new Random();
-    private static Set entities;
-    private static Object[] entStrings;
+    private static String[] entStrings;
     private static int id;
     private static boolean erroredOut = false;
 
@@ -79,7 +77,7 @@ public class BSMainMenuRenderTicker {
         entityBlacklist.add("ml_GenericVillager");
 
         entityBlacklist.add("BiomesOPlenty.Phantom");
-        entityBlacklist.add("Forestry.butterflyGE");
+        entityBlacklist.add("forestry.butterflyGE");
         entityBlacklist.add("TConstruct.Crystal");
         entityBlacklist.add("Thaumcraft.Firebat");
         entityBlacklist.add("Thaumcraft.TaintSpore");
@@ -97,6 +95,7 @@ public class BSMainMenuRenderTicker {
         entityBlacklist.add("TwilightForest.Mosquito Swarm");
         entityBlacklist.add("TwilightForest.Upper Goblin Knight");
         entityBlacklist.add("graves.playerzombie");
+        entityBlacklist.add("headcrumbs.Human");
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
         // UUIDs gotten using mctools.connorlinfoot.com
@@ -128,7 +127,6 @@ public class BSMainMenuRenderTicker {
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("75831c039a0a496ba7776a78ef8833a6"), "_Sunstrike"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("b72d87cefa984a5ab5a05db51a018d09"), "sdkillen"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("af1483804ba54a3da47d710f710f9265"), "Minalien"));
-        fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("72ddaa057bbe4ae298922c8d90ea0ad8"), "RWTema"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("6bdd4acd5637448898583de07cc820d5"), "futureamnet"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("8e32d7a9c8124fa78daf465ff9ffa262"), "AbrarSyed"));
         fallbackPlayerNames.add(new SimpleEntry<UUID, String>(UUIDTypeAdapter.fromString("6ac7c57d8c154ffeae5d5e04bd606786"), "TDWP_FTW"));
@@ -172,17 +170,14 @@ public class BSMainMenuRenderTicker {
         };
 
         // Get a COPY dumbass!
-        entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
+        Set entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
         entities.removeAll(entityBlacklist);
-        entStrings = entities.toArray(new Object[]{});
+        entStrings = (String[]) entities.toArray(new String[]{});
         id = -1;
     }
 
     private World world;
     private EntityLivingBase randMob;
-    @SuppressWarnings("unused")
-    private GuiScreen savedScreen;
-
 
     public BSMainMenuRenderTicker() {
         mcClient = FMLClientHandler.instance().getClient();
@@ -191,31 +186,21 @@ public class BSMainMenuRenderTicker {
     private static EntityLivingBase getNextEntity(World world) {
         Class clazz;
         int tries = 0;
-        final NetworkPlayerInfo networkPlayerInfo;
-        GameProfile gameProfile;
         do {
             if (++id >= entStrings.length)
                 id = 0;
-            clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
+            clazz = (Class) EntityList.NAME_TO_CLASS.get((String) entStrings[id]);
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
 
-        if (!EntityLivingBase.class.isAssignableFrom(clazz)) {
-            final SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
-            gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
-            networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
-            return new EntityOtherPlayerMP(world, gameProfile) {
-                @Nullable
-                @Override
-                protected NetworkPlayerInfo getPlayerInfo() {
-                    return networkPlayerInfo;
-                }
-            };
-        }
-        if (MenuMobs.instance.allowDebugOutput)
-            LogHelper.info(entStrings[id].toString());
+        //Using a player as fallback.
+        if (!EntityLivingBase.class.isAssignableFrom(clazz))
+            return getRandomPlayer(world);
 
-        return (EntityLivingBase) EntityList.createEntityByName((String) entStrings[id], world);
+        if (MenuMobs.instance.allowDebugOutput)
+            LogHelper.info(entStrings[id]);
+
+        return (EntityLivingBase) EntityList.createEntityByName(entStrings[id], world);
     }
 
     private static void setRandomMobItem(EntityLivingBase ent) {
@@ -242,11 +227,26 @@ public class BSMainMenuRenderTicker {
         }
     }
 
+    private static EntityOtherPlayerMP getRandomPlayer(World world) {
+        final NetworkPlayerInfo networkPlayerInfo;
+        GameProfile gameProfile;
+        final SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
+        gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
+        networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
+        return new EntityOtherPlayerMP(world, gameProfile) {
+            @Nullable
+            @Override
+            protected NetworkPlayerInfo getPlayerInfo() {
+                return networkPlayerInfo;
+            }
+        };
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.RenderTickEvent event) {
         if (Loader.isModLoaded("WorldStateCheckpoints")) {
             MenuMobs.instance.showMainMenuMobs = false;
-            LogHelper.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints has been disabled for the remainder of this session.");
+            LogHelper.severe("Main menu mob rendering is known to cause crashes with WorldStateCheckpoints and has been disabled for the remainder of this session.");
             this.unRegister();
         }
 
@@ -288,6 +288,15 @@ public class BSMainMenuRenderTicker {
         }
     }
 
+    @SubscribeEvent
+    public void onGameTick(TickEvent.ClientTickEvent event) {
+        if (world != null && randMob != null && event.phase == TickEvent.Phase.START){
+            world.updateEntity(randMob);
+            world.updateEntity(mcClient.thePlayer);
+        }
+
+    }
+
     private void init() {
         try {
             boolean createNewWorld = world == null;
@@ -303,7 +312,6 @@ public class BSMainMenuRenderTicker {
                         return new NetworkPlayerInfo(mcClient.getSession().getProfile());
                     }
 
-                    @Nullable
                     @Override
                     public NetworkPlayerInfo getPlayerInfo(String name) {
                         return new NetworkPlayerInfo(mcClient.getSession().getProfile());
@@ -316,7 +324,9 @@ public class BSMainMenuRenderTicker {
             }
 
             if (createNewWorld || (randMob == null)) {
-                if (MenuMobs.instance.allowDebugOutput) {
+                if (MenuMobs.instance.showOnlyPlayers) {
+                    randMob = getRandomPlayer(world);
+                } else if (MenuMobs.instance.allowDebugOutput) {
                     randMob = getNextEntity(world);
                 } else {
                     randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
@@ -324,8 +334,7 @@ public class BSMainMenuRenderTicker {
                 setRandomMobItem(randMob);
             }
 
-            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, mcClient.thePlayer, mcClient.gameSettings, 0.0F);
-            savedScreen = mcClient.currentScreen;
+            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, randMob, mcClient.gameSettings, 0.0F);
         } catch (Throwable e) {
             LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
             e.printStackTrace();

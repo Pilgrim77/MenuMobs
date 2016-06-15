@@ -5,6 +5,7 @@ import net.minecraftforge.common.config.Property;
 import static net.minecraftforge.common.config.Property.Type.BOOLEAN;
 
 public enum ConfigElement {
+    SHOW_ONLY_PLAYER_MODELS("showOnlyPlayerModels", "superbas11.configgui.showOnlyPlayerModels", "", BOOLEAN),
     ALLOW_DEBUG_OUTPUT("allowDebugOutput", "superbas11.configgui.allowDebugOutput", "", BOOLEAN),
     SHOW_MAIN_MENU_MOBS("showMainMenuMobs", "superbas11.configgui.showMainMenuMobs",
             "Set to true to show your logged-in player and a random mob on the main menu, false to disable.", BOOLEAN);

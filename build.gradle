@@ -22,6 +22,13 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "maven"
+apply plugin: 'idea'
+
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+}
 
 compileJava.options.encoding = 'UTF-8'
 

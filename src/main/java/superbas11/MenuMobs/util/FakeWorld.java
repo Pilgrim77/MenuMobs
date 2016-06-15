@@ -75,11 +75,6 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, IBlockState newState, int flags) {
-        return super.setBlockState(pos, newState, flags);
-    }
-
-    @Override
     public IBlockState getBlockState(BlockPos pos) {
         return pos.getY() > 63 ? Blocks.AIR.getDefaultState() : Blocks.GRASS.getDefaultState();
     }
@@ -265,37 +260,8 @@ public class FakeWorld extends World {
         return 6;
     }
 
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getMoonPhase() {
-        return super.getMoonPhase();
-    }
-
-    @Override
-    public float getCurrentMoonPhaseFactor() {
-        return super.getCurrentMoonPhaseFactor();
-    }
-
-    @Override
-    public float getCelestialAngleRadians(float par1) {
-        return super.getCelestialAngleRadians(par1);
-    }
-
     @Override
     public void scheduleBlockUpdate(BlockPos pos, Block blockIn, int delay, int priority) {
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public float getStarBrightness(float par1) {
-        return super.getStarBrightness(par1);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public float getStarBrightnessBody(float par1) {
-        return super.getStarBrightnessBody(par1);
     }
 
     @Override
@@ -304,6 +270,7 @@ public class FakeWorld extends World {
 
     @Override
     public void updateEntity(Entity par1Entity) {
+        par1Entity.ticksExisted++;
     }
 
     @Override
@@ -346,22 +313,6 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public Explosion createExplosion(Entity par1Entity, double par2, double par4, double par6, float par8, boolean par9) {
-        return super.createExplosion(par1Entity, par2, par4, par6, par8, par9);
-    }
-
-    @Override
-    public Explosion newExplosion(Entity par1Entity, double par2, double par4, double par6, float par8, boolean par9, boolean par10) {
-        return super.newExplosion(par1Entity, par2, par4, par6, par8, par9, par10);
-    }
-
-
-    @Override
-    public float getBlockDensity(Vec3d vec, AxisAlignedBB bb) {
-        return super.getBlockDensity(vec, bb);
-    }
-
-    @Override
     public TileEntity getTileEntity(BlockPos pos) {
         return null;
     }
@@ -396,32 +347,12 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public boolean isBlockFullCube(BlockPos pos) {
-        return super.isBlockFullCube(pos);
-    }
-
-    @Override
     public boolean isBlockNormalCube(BlockPos pos, boolean _default) {
         return true;
     }
 
     @Override
-    public void calculateInitialSkylight() {
-        super.calculateInitialSkylight();
-    }
-
-    @Override
-    public void setAllowedSpawnTypes(boolean par1, boolean par2) {
-        super.setAllowedSpawnTypes(par1, par2);
-    }
-
-    @Override
     public void tick() {
-    }
-
-    @Override
-    public void calculateInitialWeatherBody() {
-        super.calculateInitialWeatherBody();
     }
 
     @Override
@@ -475,27 +406,8 @@ public class FakeWorld extends World {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public List getEntitiesWithinAABBExcludingEntity(Entity par1Entity, AxisAlignedBB par2AxisAlignedBB) {
-        return super.getEntitiesWithinAABBExcludingEntity(par1Entity, par2AxisAlignedBB);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public List getEntitiesWithinAABB(Class par1Class, AxisAlignedBB par2AxisAlignedBB) {
-        return super.getEntitiesWithinAABB(par1Class, par2AxisAlignedBB);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
     public Entity findNearestEntityWithinAABB(Class par1Class, AxisAlignedBB par2AxisAlignedBB, Entity par3Entity) {
         return null;
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    @SideOnly(Side.CLIENT)
-    public List getLoadedEntityList() {
-        return super.getLoadedEntityList();
     }
 
     @Override
@@ -540,22 +452,6 @@ public class FakeWorld extends World {
     @Override
     public int isBlockIndirectlyGettingPowered(BlockPos pos) {
         return 0;
-    }
-
-    @Override
-    public EntityPlayer getClosestPlayerToEntity(Entity par1Entity, double par2) {
-        return super.getClosestPlayerToEntity(par1Entity, par2);
-    }
-
-    @Override
-    public EntityPlayer getPlayerEntityByName(String par1Str) {
-        return super.getPlayerEntityByName(par1Str);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void sendQuittingDisconnectingPacket() {
-        super.sendQuittingDisconnectingPacket();
     }
 
     @Override
@@ -606,32 +502,12 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public IChunkProvider getChunkProvider() {
-        return super.getChunkProvider();
-    }
-
-    @Override
     public float getThunderStrength(float delta) {
         return 0.0F;
     }
 
     @Override
     public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam) {
-    }
-
-    @Override
-    public ISaveHandler getSaveHandler() {
-        return super.getSaveHandler();
-    }
-
-    @Override
-    public WorldInfo getWorldInfo() {
-        return super.getWorldInfo();
-    }
-
-    @Override
-    public GameRules getGameRules() {
-        return super.getGameRules();
     }
 
     @Override
@@ -827,12 +703,6 @@ public class FakeWorld extends World {
         }
 
         @Override
-        @SideOnly(Side.CLIENT)
-        public float getStarBrightness(float par1) {
-            return super.getStarBrightness(par1);
-        }
-
-        @Override
         public void setAllowedSpawnTypes(boolean allowHostile, boolean allowPeaceful) {
         }
 
@@ -961,7 +831,7 @@ public class FakeWorld extends World {
         }
     }
 
-    public static class FakeChunkProvider implements IChunkProvider {
+    protected static class FakeChunkProvider implements IChunkProvider {
         @Override
         public Chunk getLoadedChunk(int x, int z) {
             return null;

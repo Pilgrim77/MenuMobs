@@ -1,5 +1,8 @@
 package superbas11.MenuMobs;
 
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -16,15 +19,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod(modid = Reference.MODID, name = Reference.NAME, version = "@MOD_VERSION@", useMetadata = true, guiFactory = Reference.GUI_FACTORY,clientSideOnly = true)
+@Mod(modid = Reference.MODID, name = Reference.NAME, version = "@MOD_VERSION@", useMetadata = true, clientSideOnly = true, guiFactory = Reference.GUI_FACTORY)
 public class MenuMobs {
     @Instance(value = Reference.MODID)
     public static MenuMobs instance;
-    @SidedProxy(clientSide = Reference.PROXY_CLIENT, serverSide = Reference.PROXY_COMMON)
-    public static CommonProxy proxy;
-    public boolean showOnlyPlayers = false;
     public boolean allowDebugOutput = false;
     public boolean showMainMenuMobs = true;
+    private BSMainMenuRenderTicker mainMenuTicker;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -61,12 +62,12 @@ public class MenuMobs {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        FMLCommonHandler.instance().bus().register(instance);
+        MinecraftForge.EVENT_BUS.register(instance);
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        proxy.registerMainMenuTickHandler();
+        mainMenuTicker = new BSMainMenuRenderTicker();
     }
 
     @SubscribeEvent
@@ -75,5 +76,14 @@ public class MenuMobs {
             Reference.config.save();
             syncConfig();
         }
+    }
+
+    @SubscribeEvent
+    public void onGuiOpen(GuiOpenEvent event) {
+        if (showMainMenuMobs)
+            if ((event.getGui() instanceof GuiMainMenu) && !mainMenuTicker.isRegistered())
+                mainMenuTicker.register();
+            else if (mainMenuTicker.isRegistered())
+                mainMenuTicker.unRegister();
     }
 }

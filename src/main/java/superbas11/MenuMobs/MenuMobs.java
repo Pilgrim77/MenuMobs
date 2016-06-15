@@ -5,11 +5,9 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -23,6 +21,7 @@ import java.util.List;
 public class MenuMobs {
     @Instance(value = Reference.MODID)
     public static MenuMobs instance;
+    public boolean showOnlyPlayers = false;
     public boolean allowDebugOutput = false;
     public boolean showMainMenuMobs = true;
     private BSMainMenuRenderTicker mainMenuTicker;

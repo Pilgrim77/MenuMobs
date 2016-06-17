@@ -13,6 +13,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityPigZombie;
@@ -197,7 +198,7 @@ public class BSMainMenuRenderTicker {
         if (!EntityLivingBase.class.isAssignableFrom(clazz))
             return getRandomPlayer(world);
 
-        if (MenuMobs.instance.allowDebugOutput)
+        if (ConfigElement.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
             LogHelper.info(entStrings[id]);
 
         return (EntityLivingBase) EntityList.createEntityByName(entStrings[id], world);
@@ -290,11 +291,18 @@ public class BSMainMenuRenderTicker {
 
     @SubscribeEvent
     public void onGameTick(TickEvent.ClientTickEvent event) {
-        if (world != null && randMob != null && event.phase == TickEvent.Phase.START){
+        if (world != null && randMob != null && event.phase == TickEvent.Phase.START) {
+
             world.updateEntity(randMob);
             world.updateEntity(mcClient.thePlayer);
-        }
 
+            if (randMob instanceof EntityLiving && ConfigElement.MOB_SOUNDS_VOLUME.getSetting().getDouble() > 0.0F) {
+                if (randMob.isEntityAlive() && this.random.nextInt(1000) < ((EntityLiving) randMob).livingSoundTime++) {
+                    ((EntityLiving) randMob).livingSoundTime = -((EntityLiving) randMob).getTalkInterval();
+                    ((EntityLiving) randMob).playLivingSound();
+                }
+            }
+        }
     }
 
     private void init() {
@@ -324,9 +332,9 @@ public class BSMainMenuRenderTicker {
             }
 
             if (createNewWorld || (randMob == null)) {
-                if (MenuMobs.instance.showOnlyPlayers) {
+                if (ConfigElement.SHOW_ONLY_PLAYER_MODELS.getSetting().getBoolean()) {
                     randMob = getRandomPlayer(world);
-                } else if (MenuMobs.instance.allowDebugOutput) {
+                } else if (ConfigElement.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean()) {
                     randMob = getNextEntity(world);
                 } else {
                     randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);

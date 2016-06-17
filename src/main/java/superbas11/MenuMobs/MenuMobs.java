@@ -21,8 +21,6 @@ import java.util.List;
 public class MenuMobs {
     @Instance(value = Reference.MODID)
     public static MenuMobs instance;
-    public boolean showOnlyPlayers = false;
-    public boolean allowDebugOutput = false;
     public boolean showMainMenuMobs = true;
     private BSMainMenuRenderTicker mainMenuTicker;
 
@@ -38,21 +36,15 @@ public class MenuMobs {
         Reference.config.load();
 
         Reference.config.setCategoryComment(ctgyGen, "ATTENTION: Editing this file manually is no longer necessary. \n" +
-                "On the Mods list screen select the entry for bspkrsCore, then click the Config button to modify these settings.");
+                "On the Mods list screen select the entry for MenuMobs, then click the Config button to modify these settings.");
 
         List<String> orderedKeys = new ArrayList<String>(ConfigElement.values().length);
 
-        showOnlyPlayers = Reference.config.getBoolean(ConfigElement.SHOW_ONLY_PLAYER_MODELS.key(), ctgyGen, showOnlyPlayers,
-                ConfigElement.SHOW_ONLY_PLAYER_MODELS.desc(), ConfigElement.SHOW_ONLY_PLAYER_MODELS.languageKey());
-        orderedKeys.add(ConfigElement.SHOW_ONLY_PLAYER_MODELS.key());
-
-        allowDebugOutput = Reference.config.getBoolean(ConfigElement.ALLOW_DEBUG_OUTPUT.key(), ctgyGen, allowDebugOutput,
-                ConfigElement.ALLOW_DEBUG_OUTPUT.desc(), ConfigElement.ALLOW_DEBUG_OUTPUT.languageKey());
-        orderedKeys.add(ConfigElement.ALLOW_DEBUG_OUTPUT.key());
-
-        showMainMenuMobs = Reference.config.getBoolean(ConfigElement.SHOW_MAIN_MENU_MOBS.key(), ctgyGen, showMainMenuMobs,
-                ConfigElement.SHOW_MAIN_MENU_MOBS.desc(), ConfigElement.SHOW_MAIN_MENU_MOBS.languageKey());
-        orderedKeys.add(ConfigElement.SHOW_MAIN_MENU_MOBS.key());
+        for (ConfigElement Element : ConfigElement.values()) {
+            Element.syncConfig();
+            orderedKeys.add(Element.getKey());
+        }
+        showMainMenuMobs = ConfigElement.SHOW_MAIN_MENU_MOBS.getSetting().getBoolean();
 
         Reference.config.setCategoryPropertyOrder(ctgyGen, orderedKeys);
 

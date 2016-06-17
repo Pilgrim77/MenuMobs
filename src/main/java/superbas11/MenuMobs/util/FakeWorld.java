@@ -3,6 +3,8 @@ package superbas11.MenuMobs.util;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
@@ -30,8 +32,10 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import superbas11.MenuMobs.ConfigElement;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -46,6 +50,7 @@ import java.util.List;
 public class FakeWorld extends World {
     public FakeWorld(WorldInfo worldInfo) {
         super(new FakeSaveHandler(), worldInfo, new FakeWorldProvider(), new Profiler(), true);
+        this.provider.registerWorld(this);
     }
 
     @Override
@@ -167,7 +172,6 @@ public class FakeWorld extends World {
         return new BlockPos(pos.getX(), 63, pos.getZ());
     }
 
-
     @Override
     public int getChunksLowestHorizon(int x, int z) {
         return 63;
@@ -191,15 +195,9 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public void playSound(EntityPlayer player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
-    }
-
-    @Override
     public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
-    }
-
-    @Override
-    public void playSound(double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay) {
+        PositionedSoundRecord positionedsoundrecord = new PositionedSoundRecord(soundIn.getSoundName(), SoundCategory.MASTER, ((float) ConfigElement.MOB_SOUNDS_VOLUME.getSetting().getDouble()), pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F);
+        FMLClientHandler.instance().getClient().getSoundHandler().playSound(positionedsoundrecord);
     }
 
     @Override
@@ -269,12 +267,9 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public void updateEntity(Entity par1Entity) {
-        par1Entity.ticksExisted++;
-    }
-
-    @Override
-    public void updateEntityWithOptionalForce(Entity par1Entity, boolean par2) {
+    public void updateEntityWithOptionalForce(Entity entityIn, boolean forceUpdate) {
+        if (forceUpdate)
+            ++entityIn.ticksExisted;
     }
 
     @Override

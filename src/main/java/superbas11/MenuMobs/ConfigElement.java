@@ -13,7 +13,7 @@ public enum ConfigElement {
             "Set to true to show your logged-in player and a random mob on the main menu, false to disable.",
             "true", BOOLEAN),
     SHOW_ONLY_PLAYER_MODELS("showOnlyPlayerModels", "superbas11.configgui.showOnlyPlayerModels", "", "false", BOOLEAN),
-    MOB_SOUNDS_VOLUME("mobSoundVolume", "superbas11.configgui.mobSoundVolume", "", DOUBLE, 0.0F, 1.0F, VolumeSliderEntry.class),
+    MOB_SOUNDS_VOLUME("mobSoundVolume", "superbas11.configgui.mobSoundVolume", "", "0.5", DOUBLE, 0.0F, 1.0F, VolumeSliderEntry.class),
     ALLOW_DEBUG_OUTPUT("allowDebugOutput", "superbas11.configgui.allowDebugOutput", "", "false", BOOLEAN);
 
     private String key;
@@ -33,8 +33,8 @@ public enum ConfigElement {
         this.Setting = Reference.config.get(Configuration.CATEGORY_GENERAL, key, defaultString, desc, propertyType).setLanguageKey(langKey);
     }
 
-    ConfigElement(String key, String langKey, String desc, Property.Type propertyType, double min, double max, Class<? extends GuiConfigEntries.IConfigEntry> clazz) {
-        this(key, langKey, desc, "0.5", propertyType);
+    ConfigElement(String key, String langKey, String desc, String defaultString, Property.Type propertyType, double min, double max, Class<? extends GuiConfigEntries.IConfigEntry> clazz) {
+        this(key, langKey, desc, defaultString, propertyType);
         this.min = min;
         this.max = max;
         this.hasMinMax = true;

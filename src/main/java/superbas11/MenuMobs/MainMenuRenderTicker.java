@@ -46,7 +46,7 @@ import java.util.*;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @SideOnly(Side.CLIENT)
-public class BSMainMenuRenderTicker {
+public class MainMenuRenderTicker {
     private static Minecraft mcClient;
     private static boolean isRegistered = false;
     private static List entityBlacklist;
@@ -180,7 +180,7 @@ public class BSMainMenuRenderTicker {
     private World world;
     private EntityLivingBase randMob;
 
-    public BSMainMenuRenderTicker() {
+    public MainMenuRenderTicker() {
         mcClient = FMLClientHandler.instance().getClient();
     }
 
@@ -263,6 +263,7 @@ public class BSMainMenuRenderTicker {
                     int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
                     float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
                     float scale = EntityUtils.getEntityScale(randMob, targetHeight, 1.8F);
+                    // LogHelper.info(mouseX+ "-" + distanceToSide);
                     EntityUtils.drawEntityOnScreen(
                             distanceToSide,
                             (int) ((sr.getScaledHeight() / 2) + (randMob.height * scale)),

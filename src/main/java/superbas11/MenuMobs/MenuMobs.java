@@ -22,7 +22,7 @@ public class MenuMobs {
     @Instance(value = Reference.MODID)
     public static MenuMobs instance;
     public boolean showMainMenuMobs = true;
-    private BSMainMenuRenderTicker mainMenuTicker;
+    private MainMenuRenderTicker mainMenuTicker;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -58,7 +58,7 @@ public class MenuMobs {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        mainMenuTicker = new BSMainMenuRenderTicker();
+        mainMenuTicker = new MainMenuRenderTicker();
     }
 
     @SubscribeEvent

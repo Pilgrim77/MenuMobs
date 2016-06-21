@@ -484,7 +484,7 @@ public class FakeWorld extends World {
 
     @Override
     public boolean canSeeSky(BlockPos pos) {
-        return pos.getY() > 63;
+        return pos.getY() > 62;
     }
 
     @Override

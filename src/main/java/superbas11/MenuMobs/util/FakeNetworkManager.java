@@ -1,4 +1,4 @@
-package superbas11.MenuMobs.util;
+package superbas11.menumobs.util;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;

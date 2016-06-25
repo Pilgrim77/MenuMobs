@@ -1,7 +1,7 @@
 {
   "modListVersion": 2,
   "modList": [{
-    "modid": "MenuMobs",
+    "modid": "menumobs",
     "name": "Menu Mobs",
     "description": "Gimmick mod for Minecraft that renders the current player and a random mob on the in-game menus. Credits: bspkrs.",
     "version": "${mod_version}",

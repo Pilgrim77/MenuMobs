@@ -1,4 +1,4 @@
-package superbas11.MenuMobs;
+package superbas11.menumobs;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
@@ -35,10 +35,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
-import superbas11.MenuMobs.client.util.EntityUtils;
-import superbas11.MenuMobs.util.FakeNetworkManager;
-import superbas11.MenuMobs.util.FakeWorld;
-import superbas11.MenuMobs.util.LogHelper;
+import superbas11.menumobs.client.util.EntityUtils;
+import superbas11.menumobs.util.FakeNetworkManager;
+import superbas11.menumobs.util.FakeWorld;
+import superbas11.menumobs.util.LogHelper;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap.SimpleEntry;

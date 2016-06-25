@@ -1,4 +1,4 @@
-package superbas11.MenuMobs;
+package superbas11.menumobs;
 
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -36,7 +36,7 @@ public class MenuMobs {
         Reference.config.load();
 
         Reference.config.setCategoryComment(ctgyGen, "ATTENTION: Editing this file manually is no longer necessary. \n" +
-                "On the Mods list screen select the entry for MenuMobs, then click the Config button to modify these settings.");
+                "On the Mods list screen select the entry for menumobs, then click the Config button to modify these settings.");
 
         List<String> orderedKeys = new ArrayList<String>(ConfigElement.values().length);
 

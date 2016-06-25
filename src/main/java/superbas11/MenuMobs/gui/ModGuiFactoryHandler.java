@@ -1,4 +1,4 @@
-package superbas11.MenuMobs.gui;
+package superbas11.menumobs.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

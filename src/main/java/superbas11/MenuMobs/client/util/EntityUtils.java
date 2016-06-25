@@ -1,4 +1,4 @@
-package superbas11.MenuMobs.client.util;
+package superbas11.menumobs.client.util;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
@@ -14,8 +14,8 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
-import superbas11.MenuMobs.ConfigElement;
-import superbas11.MenuMobs.util.LogHelper;
+import superbas11.menumobs.ConfigElement;
+import superbas11.menumobs.util.LogHelper;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;

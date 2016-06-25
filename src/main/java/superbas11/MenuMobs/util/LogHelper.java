@@ -1,9 +1,9 @@
-package superbas11.MenuMobs.util;
+package superbas11.menumobs.util;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import superbas11.MenuMobs.Reference;
+import superbas11.menumobs.Reference;
 
 public enum LogHelper {
     INSTANCE;

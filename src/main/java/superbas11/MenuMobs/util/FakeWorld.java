@@ -1,4 +1,4 @@
-package superbas11.MenuMobs.util;
+package superbas11.menumobs.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -35,7 +35,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import superbas11.MenuMobs.ConfigElement;
+import superbas11.menumobs.ConfigElement;
 
 import javax.annotation.Nullable;
 import java.io.File;

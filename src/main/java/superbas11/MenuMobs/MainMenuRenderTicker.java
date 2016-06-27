@@ -338,6 +338,7 @@ public class MainMenuRenderTicker {
                     ModelParts |= enumplayermodelparts.getPartMask();
                 }
                 mcClient.thePlayer.getDataManager().set(mcClient.thePlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
+                mcClient.thePlayer.setPrimaryHand(mcClient.gameSettings.mainHand);
                 mcClient.thePlayer.dimension = 0;
                 mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
                 mcClient.thePlayer.eyeHeight = 1.82F;

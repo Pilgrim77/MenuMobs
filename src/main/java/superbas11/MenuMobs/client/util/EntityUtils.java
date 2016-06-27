@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import superbas11.menumobs.ConfigElement;
 import superbas11.menumobs.util.LogHelper;
@@ -165,6 +166,8 @@ public class EntityUtils {
         ent.rotationYawHead = ent.rotationYaw;
         ent.prevRotationYawHead = ent.rotationYaw;
         GlStateManager.translate(0.0F, 0.0F, 0.0F);
+        if (ent instanceof EntityPlayer)
+            ((EntityPlayer) ent).updateCape();
         try {
             RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
             rendermanager.setPlayerViewY(180.0F);

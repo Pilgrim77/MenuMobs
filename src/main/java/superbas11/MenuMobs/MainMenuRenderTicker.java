@@ -15,10 +15,9 @@ import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -211,11 +210,20 @@ public class MainMenuRenderTicker {
             else if (ent instanceof EntityPigZombie)
                 ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
             else if (ent instanceof EntitySkeleton) {
-                if (random.nextBoolean()) {
-                    ((EntitySkeleton) ent).setSkeletonType(1);
-                    ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-                } else
-                    ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
+                switch (random.nextInt(3)) {
+                    case 0:
+                        ((EntitySkeleton) ent).func_189768_a(SkeletonType.WITHER);
+                        ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
+                        break;
+                    case 1:
+                        ((EntitySkeleton) ent).func_189768_a(SkeletonType.STRAY);
+                        ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
+                        break;
+                    case 2:
+                        ((EntitySkeleton) ent).func_189768_a(SkeletonType.NORMAL);
+                        ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
+                        break;
+                }
             } else if (ent instanceof EntityZombie)
                 ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
             else if (ent instanceof EntityEnderman) {
@@ -231,7 +239,7 @@ public class MainMenuRenderTicker {
     private static EntityOtherPlayerMP getRandomPlayer(World world) {
         final NetworkPlayerInfo networkPlayerInfo;
         GameProfile gameProfile;
-        final SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
+        SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
         gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
         networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
         return new EntityOtherPlayerMP(world, gameProfile) {
@@ -263,7 +271,6 @@ public class MainMenuRenderTicker {
                     int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
                     float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
                     float scale = EntityUtils.getEntityScale(randMob, targetHeight, 1.8F);
-                    // LogHelper.info(mouseX+ "-" + distanceToSide);
                     EntityUtils.drawEntityOnScreen(
                             distanceToSide,
                             (int) ((sr.getScaledHeight() / 2) + (randMob.height * scale)),
@@ -326,6 +333,11 @@ public class MainMenuRenderTicker {
                         return new NetworkPlayerInfo(mcClient.getSession().getProfile());
                     }
                 }, null);
+                int ModelParts = 0;
+                for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
+                    ModelParts |= enumplayermodelparts.getPartMask();
+                }
+                mcClient.thePlayer.getDataManager().set(mcClient.thePlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
                 mcClient.thePlayer.dimension = 0;
                 mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
                 mcClient.thePlayer.eyeHeight = 1.82F;
@@ -340,10 +352,12 @@ public class MainMenuRenderTicker {
                 } else {
                     randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
                 }
+                if (randMob instanceof EntityPlayer)
+                    randMob.getDataManager().set(((EntityPlayer) randMob).PLAYER_MODEL_FLAG, Byte.valueOf((byte) 127));
                 setRandomMobItem(randMob);
             }
 
-            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, randMob, mcClient.gameSettings, 0.0F);
+            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, mcClient.thePlayer, mcClient.gameSettings, 0.0F);
         } catch (Throwable e) {
             LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
             e.printStackTrace();

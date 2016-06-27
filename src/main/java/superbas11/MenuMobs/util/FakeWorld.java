@@ -781,7 +781,7 @@ public class FakeWorld extends World {
     protected static class FakeSaveHandler implements ISaveHandler {
         @Override
         public TemplateManager getStructureTemplateManager() {
-            return new TemplateManager();
+            return new TemplateManager("");
         }
 
         @Override

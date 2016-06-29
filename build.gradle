@@ -47,7 +47,7 @@ version = config.mod_version
 archivesBaseName = "[${config.minecraft_version}]${config.mod_id}"
 
 minecraft {
-    version = config.minecraft_version + "-" + config.forge_version // grab latest forge
+    version = config.minecraft_version + "-" + config.forge_version + "-1.10.0" // grab latest forge
     mappings = config.mappings_version
     runDir = "run"
     replace '@MOD_VERSION@', config.mod_version

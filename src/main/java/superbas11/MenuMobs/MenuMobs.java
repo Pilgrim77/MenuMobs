@@ -1,6 +1,5 @@
 package superbas11.menumobs;
 
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -72,7 +71,7 @@ public class MenuMobs {
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
         if (showMainMenuMobs)
-            if ((event.getGui() instanceof GuiMainMenu) && !mainMenuTicker.isRegistered())
+            if (mainMenuTicker.isMainMenu(event.getGui()))
                 mainMenuTicker.register();
             else if (mainMenuTicker.isRegistered())
                 mainMenuTicker.unRegister();

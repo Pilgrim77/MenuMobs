@@ -9,6 +9,7 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -259,7 +260,7 @@ public class MainMenuRenderTicker {
             this.unRegister();
         }
 
-        if (MenuMobs.instance.showMainMenuMobs && !erroredOut && (mcClient.currentScreen instanceof GuiMainMenu)) {
+        if (MenuMobs.instance.showMainMenuMobs && !erroredOut && isMainMenu(mcClient.currentScreen)) {
             try {
                 if ((mcClient.thePlayer == null) || (mcClient.thePlayer.worldObj == null) || (randMob == null))
                     init();
@@ -390,5 +391,14 @@ public class MainMenuRenderTicker {
 
     public boolean isRegistered() {
         return isRegistered;
+    }
+
+    public static String[] getEntStrings() {
+        return entStrings;
+    }
+
+    public boolean isMainMenu(GuiScreen gui) {
+        return gui instanceof GuiMainMenu ||
+                gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
     }
 }

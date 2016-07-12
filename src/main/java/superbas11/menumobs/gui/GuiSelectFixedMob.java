@@ -4,12 +4,14 @@ package superbas11.menumobs.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.config.*;
+import net.minecraftforge.fml.client.config.GuiSelectString;
+import net.minecraftforge.fml.client.config.GuiSelectStringEntries;
+import net.minecraftforge.fml.client.config.IConfigElement;
 
 import java.util.Map;
 
-public class GuiSelectFixedMob extends GuiSelectString{
-    public GuiSelectFixedMob(GuiScreen parentScreen,IConfigElement configElement,int slotIndex, Map<Object, String> selectableValues, Object currentValue, boolean enabled) {
+public class GuiSelectFixedMob extends GuiSelectString {
+    public GuiSelectFixedMob(GuiScreen parentScreen, IConfigElement configElement, int slotIndex, Map<Object, String> selectableValues, Object currentValue, boolean enabled) {
         super(parentScreen, configElement, slotIndex, selectableValues, currentValue, enabled);
     }
 
@@ -21,25 +23,17 @@ public class GuiSelectFixedMob extends GuiSelectString{
 
     @Override
     protected void actionPerformed(GuiButton button) {
-        if (button.id == 2000)
-        {
-            try
-            {
+        if (button.id == 2000) {
+            try {
                 this.entryList.saveChanges();
-            }
-            catch (Throwable e)
-            {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
             this.mc.displayGuiScreen(this.parentScreen);
-        }
-        else if (button.id == 2001)
-        {
+        } else if (button.id == 2001) {
             this.currentValue = configElement.getDefault();
             this.entryList = new GuiSelectFixedMobEntries(this, this.mc, this.configElement, this.selectableValues);
-        }
-        else if (button.id == 2002)
-        {
+        } else if (button.id == 2002) {
             this.currentValue = beforeValue;
             this.entryList = new GuiSelectFixedMobEntries(this, this.mc, this.configElement, this.selectableValues);
         }
@@ -53,7 +47,11 @@ public class GuiSelectFixedMob extends GuiSelectString{
         @Override
         public void saveChanges() {
             if (slotIndex != -1 && parentScreen != null && parentScreen instanceof GuiFixedMobEntry)
-                ((GuiFixedMobEntry) parentScreen).setCurrentValue(slotIndex,owningScreen.currentValue);
+                ((GuiFixedMobEntry) parentScreen).setValueFromChildScreen(slotIndex, owningScreen.currentValue);
+//            {
+//                FixedEntityArrayEntry.FixedMobArrayEntry entry = (FixedEntityArrayEntry.FixedMobArrayEntry) ((GuiFixedMobEntry) parentScreen).getEntryList().listEntries.get(slotIndex);
+//                entry.setValueFromChildScreen(owningScreen.currentValue);
+//            }
         }
     }
 }

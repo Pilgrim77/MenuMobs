@@ -11,58 +11,66 @@ import net.minecraftforge.fml.common.FMLLog;
 import org.lwjgl.input.Keyboard;
 import superbas11.menumobs.MainMenuRenderTicker;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-public class GuiFixedMobEntry extends GuiEditArray
-{
+public class GuiFixedMobEntry extends GuiEditArray {
+    private HashMap<Integer, Object> newValues = new HashMap();
+
     public GuiFixedMobEntry(GuiScreen parentScreen, IConfigElement configElement, int slotIndex, Object[] currentValues, boolean enabled) {
         super(parentScreen, configElement, slotIndex, currentValues, enabled);
     }
 
     @Override
-    public void initGui()
-    {
+    public void initGui() {
         super.initGui();
         this.entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
+
+        for (Map.Entry<Integer, Object> entry : newValues.entrySet()) {
+            try {
+                if (this.entryList.listEntries.get(entry.getKey()) instanceof FixedEntityArrayEntry.FixedMobArrayEntry)
+                    ((FixedEntityArrayEntry.FixedMobArrayEntry) this.entryList.listEntries.get(entry.getKey())).setValueFromChildScreen(entry.getValue());
+                else
+                    this.entryList.listEntries.add(entry.getKey(), new FixedEntityArrayEntry.FixedMobArrayEntry(this, entryList, configElement, entry.getValue()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        newValues = new HashMap<Integer, Object>();
     }
 
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
     @Override
-    protected void actionPerformed(GuiButton button)
-    {
+    protected void actionPerformed(GuiButton button) {
         super.actionPerformed(button);
-        if (button.id == 2001)
-        {
+        if (button.id == 2001) {
             this.entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
-        }
-        else if (button.id == 2002)
-        {
+        } else if (button.id == 2002) {
             this.entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
         }
     }
 
-    public GuiEditArrayEntries getEntryList(){
-        return this.entryList;
-    }
-
-    public void setCurrentValue(int index, Object value){
-        this.currentValues[index] = value;
-        this.updateScreen();
+    public void setValueFromChildScreen(int index, Object value) {
+        this.newValues.put(index, value);
     }
 
     public static class GuiEditFixedMobEntries extends GuiEditArrayEntries {
+
         public GuiEditFixedMobEntries(GuiEditArray parent, Minecraft mc, IConfigElement configElement, Object[] beforeValues, Object[] currentValues) {
             super(parent, mc, configElement, beforeValues, currentValues);
             listEntries = new ArrayList<IArrayEntry>();
-            if (configElement.isList() && configElement.getArrayEntryClass() != null) {
-                Class<? extends IArrayEntry> clazz = configElement.getArrayEntryClass();
+
+            if (configElement.isList()) {
+                Class<? extends IArrayEntry> clazz;
                 for (Object value : currentValues) {
                     try {
+                        if (value == "")
+                            continue;
                         if (Arrays.asList(MainMenuRenderTicker.getEntStrings()).contains(value.toString()))
                             clazz = FixedEntityArrayEntry.FixedMobArrayEntry.class;
+                        else
+                            clazz = FixedEntityArrayEntry.FixedPlayerArrayEntry.class;
 
                         listEntries.add(clazz.getConstructor(GuiEditArray.class, GuiEditArrayEntries.class, IConfigElement.class, Object.class)
                                 .newInstance(this.owningGui, this, configElement, value.toString()));
@@ -82,14 +90,25 @@ public class GuiFixedMobEntry extends GuiEditArray
 
             FixedEntityArrayEntry entry;
 
-            //TODO fix logic
-            if (true == true)
-                entry = new FixedEntityArrayEntry.FixedPlayerArrayEntry(this.owningGui, this, this.configElement, "");
-            else
-                entry = new FixedEntityArrayEntry.FixedMobArrayEntry(this.owningGui, this, this.configElement, "");
+            entry = new FixedEntityArrayEntry.FixedEntityOptionEntry(this.owningGui, this, this.configElement);
 
             listEntries.add(index, entry);
             keyTyped((char) Keyboard.CHAR_NONE, Keyboard.KEY_END);
+        }
+
+        @Override
+        protected void saveListChanges() {
+            List removeList = new ArrayList<IArrayEntry>();
+            for (IArrayEntry entry : listEntries) {
+                if (entry.getValue() == "" && entry instanceof FixedEntityArrayEntry)
+                    removeList.add(entry);
+            }
+            listEntries.removeAll(removeList);
+            super.saveListChanges();
+        }
+
+        protected GuiEditArray getOwningGui() {
+            return owningGui;
         }
     }
 }

@@ -37,13 +37,13 @@ public class MenuMobs {
         Reference.config.setCategoryComment(ctgyGen, "ATTENTION: Editing this file manually is no longer necessary. \n" +
                 "On the Mods list screen select the entry for menumobs, then click the Config button to modify these settings.");
 
-        List<String> orderedKeys = new ArrayList<String>(ConfigElement.values().length);
+        List<String> orderedKeys = new ArrayList<String>(ConfigElements.values().length);
 
-        for (ConfigElement Element : ConfigElement.values()) {
+        for (ConfigElements Element : ConfigElements.values()) {
             Element.syncConfig();
             orderedKeys.add(Element.getKey());
         }
-        showMainMenuMobs = ConfigElement.SHOW_MAIN_MENU_MOBS.getSetting().getBoolean();
+        showMainMenuMobs = ConfigElements.SHOW_MAIN_MENU_MOBS.getSetting().getBoolean();
 
         Reference.config.setCategoryPropertyOrder(ctgyGen, orderedKeys);
 

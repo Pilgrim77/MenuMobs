@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import superbas11.menumobs.ConfigElement;
+import superbas11.menumobs.ConfigElements;
 import superbas11.menumobs.util.LogHelper;
 
 import javax.annotation.Nullable;
@@ -241,7 +241,7 @@ public class EntityUtils {
                         "Chicken", world);
         }
 
-        if (ConfigElement.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
+        if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
             LogHelper.info(entStrings[id].toString());
 
         return (EntityLivingBase) EntityList.createEntityByName(

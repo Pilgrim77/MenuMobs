@@ -198,7 +198,7 @@ public class MainMenuRenderTicker {
         if (!EntityLivingBase.class.isAssignableFrom(clazz))
             return getRandomPlayer(world);
 
-        if (ConfigElement.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
+        if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
             LogHelper.info(entStrings[id]);
 
         return (EntityLivingBase) EntityList.createEntityByName(entStrings[id], world);
@@ -250,6 +250,10 @@ public class MainMenuRenderTicker {
                 return networkPlayerInfo;
             }
         };
+    }
+
+    public static String[] getEntStrings() {
+        return entStrings;
     }
 
     @SubscribeEvent
@@ -305,7 +309,7 @@ public class MainMenuRenderTicker {
             world.updateEntity(randMob);
             world.updateEntity(mcClient.thePlayer);
 
-            if (randMob instanceof EntityLiving && ConfigElement.MOB_SOUNDS_VOLUME.getSetting().getDouble() > 0.0F) {
+            if (randMob instanceof EntityLiving && ConfigElements.MOB_SOUNDS_VOLUME.getSetting().getDouble() > 0.0F) {
                 if (randMob.isEntityAlive() && this.random.nextInt(1000) < ((EntityLiving) randMob).livingSoundTime++) {
                     ((EntityLiving) randMob).livingSoundTime = -((EntityLiving) randMob).getTalkInterval();
                     ((EntityLiving) randMob).playLivingSound();
@@ -347,9 +351,9 @@ public class MainMenuRenderTicker {
             }
 
             if (createNewWorld || (randMob == null)) {
-                if (ConfigElement.SHOW_ONLY_PLAYER_MODELS.getSetting().getBoolean()) {
+                if (ConfigElements.SHOW_ONLY_PLAYER_MODELS.getSetting().getBoolean()) {
                     randMob = getRandomPlayer(world);
-                } else if (ConfigElement.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean()) {
+                } else if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean()) {
                     randMob = getNextEntity(world);
                 } else {
                     randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
@@ -391,10 +395,6 @@ public class MainMenuRenderTicker {
 
     public boolean isRegistered() {
         return isRegistered;
-    }
-
-    public static String[] getEntStrings() {
-        return entStrings;
     }
 
     public boolean isMainMenu(GuiScreen gui) {

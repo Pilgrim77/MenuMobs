@@ -36,6 +36,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import superbas11.menumobs.client.util.EntityUtils;
+import superbas11.menumobs.client.util.UUIDFetcher;
 import superbas11.menumobs.util.FakeNetworkManager;
 import superbas11.menumobs.util.FakeWorld;
 import superbas11.menumobs.util.LogHelper;
@@ -204,6 +205,55 @@ public class MainMenuRenderTicker {
         return (EntityLivingBase) EntityList.createEntityByName(entStrings[id], world);
     }
 
+    private static EntityLivingBase getFixedEntity(World world) {
+        String[] entityList = ConfigElements.FIXED_MOB.getSetting().getStringList();
+        EntityLivingBase entity = null;
+        Random random = new Random();
+        Class clazz;
+        int tries = 0;
+        int id;
+
+        do {
+            id = random.nextInt(entityList.length);
+            clazz = (Class) EntityList.NAME_TO_CLASS.get(entityList[id]);
+            if (clazz == null) {
+                try {
+                    UUID UUID = UUIDFetcher.getUUIDOf(entityList[id]);
+
+                    if (UUID == null) {
+                        LogHelper.warning("Entity " + entityList[id] + " is unknown!");
+                        continue;
+                    }
+
+                    GameProfile gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(UUID, entityList[id]), true);
+                    final NetworkPlayerInfo networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
+                    entity = new EntityOtherPlayerMP(world, gameProfile) {
+                        @Nullable
+                        @Override
+                        protected NetworkPlayerInfo getPlayerInfo() {
+                            return networkPlayerInfo;
+                        }
+                    };
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                entity = (EntityLivingBase) EntityList.createEntityByName(entityList[id], world);
+            }
+        } while (entity == null && ++tries < entityList.length);
+
+        //fallback
+        if (entity == null) {
+            LogHelper.warning("Using fallback!");
+            return EntityUtils.getRandomLivingEntity(world, entityBlacklist, 5, fallbackPlayerNames);
+        }
+
+        if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
+            LogHelper.info(entityList[id]);
+
+        return entity;
+    }
+
     private static void setRandomMobItem(EntityLivingBase ent) {
         try {
             if (ent instanceof AbstractClientPlayer)
@@ -351,7 +401,9 @@ public class MainMenuRenderTicker {
             }
 
             if (createNewWorld || (randMob == null)) {
-                if (ConfigElements.SHOW_ONLY_PLAYER_MODELS.getSetting().getBoolean()) {
+                if (ConfigElements.FIXED_MOB.getSetting().getStringList().length > 0)
+                    randMob = getFixedEntity(world);
+                else if (ConfigElements.SHOW_ONLY_PLAYER_MODELS.getSetting().getBoolean()) {
                     randMob = getRandomPlayer(world);
                 } else if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean()) {
                     randMob = getNextEntity(world);

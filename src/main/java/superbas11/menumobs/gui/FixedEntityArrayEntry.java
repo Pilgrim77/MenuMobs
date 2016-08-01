@@ -98,14 +98,13 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         }
 
         public void updateValueButtonText() {
-            this.btnValue.displayString = currentValue.equals("")? "None" : currentValue.toString();
+            this.btnValue.displayString = currentValue.equals("") ? "None" : currentValue.toString();
         }
 
         @Override
         public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
             if (btnValue.mousePressed(mc, x, y)) {
                 btnValue.playPressSound(mc.getSoundHandler());
-                ((GuiFixedMobEntry.GuiEditFixedMobEntries) this.owningEntryList).saveListChanges();
                 valueButtonPressed(index);
                 updateValueButtonText();
                 return true;

@@ -48,10 +48,6 @@ public class GuiSelectFixedMob extends GuiSelectString {
         public void saveChanges() {
             if (slotIndex != -1 && parentScreen != null && parentScreen instanceof GuiFixedMobEntry)
                 ((GuiFixedMobEntry) parentScreen).setValueFromChildScreen(slotIndex, owningScreen.currentValue);
-//            {
-//                FixedEntityArrayEntry.FixedMobArrayEntry entry = (FixedEntityArrayEntry.FixedMobArrayEntry) ((GuiFixedMobEntry) parentScreen).getEntryList().listEntries.get(slotIndex);
-//                entry.setValueFromChildScreen(owningScreen.currentValue);
-//            }
         }
     }
 }

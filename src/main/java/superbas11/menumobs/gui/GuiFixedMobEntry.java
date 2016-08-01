@@ -15,6 +15,7 @@ import java.util.*;
 
 public class GuiFixedMobEntry extends GuiEditArray {
     private HashMap<Integer, Object> newValues = new HashMap();
+    private List<GuiEditArrayEntries.IArrayEntry> listEntries;
 
     public GuiFixedMobEntry(GuiScreen parentScreen, IConfigElement configElement, int slotIndex, Object[] currentValues, boolean enabled) {
         super(parentScreen, configElement, slotIndex, currentValues, enabled);
@@ -23,14 +24,17 @@ public class GuiFixedMobEntry extends GuiEditArray {
     @Override
     public void initGui() {
         super.initGui();
-        this.entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
+        entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
+
+        if (listEntries != null)
+            this.entryList.listEntries = listEntries;
 
         for (Map.Entry<Integer, Object> entry : newValues.entrySet()) {
             try {
                 if (this.entryList.listEntries.get(entry.getKey()) instanceof FixedEntityArrayEntry.FixedMobArrayEntry)
                     ((FixedEntityArrayEntry.FixedMobArrayEntry) this.entryList.listEntries.get(entry.getKey())).setValueFromChildScreen(entry.getValue());
                 else
-                    this.entryList.listEntries.add(entry.getKey(), new FixedEntityArrayEntry.FixedMobArrayEntry(this, entryList, configElement, entry.getValue()));
+                    this.entryList.listEntries.set(entry.getKey(), new FixedEntityArrayEntry.FixedMobArrayEntry(this, entryList, configElement, entry.getValue()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -44,15 +48,14 @@ public class GuiFixedMobEntry extends GuiEditArray {
     @Override
     protected void actionPerformed(GuiButton button) {
         super.actionPerformed(button);
-        if (button.id == 2001) {
+        if (button.id == 2001 || button.id == 2002)
             this.entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
-        } else if (button.id == 2002) {
-            this.entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
-        }
+
     }
 
     public void setValueFromChildScreen(int index, Object value) {
         this.newValues.put(index, value);
+        listEntries = this.entryList.listEntries;
     }
 
     public static class GuiEditFixedMobEntries extends GuiEditArrayEntries {
@@ -105,10 +108,6 @@ public class GuiFixedMobEntry extends GuiEditArray {
             }
             listEntries.removeAll(removeList);
             super.saveListChanges();
-        }
-
-        protected GuiEditArray getOwningGui() {
-            return owningGui;
         }
     }
 }

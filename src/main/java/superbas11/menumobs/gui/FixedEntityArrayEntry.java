@@ -31,21 +31,21 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
 
         public FixedEntityOptionEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement) {
             super(owningScreen, owningEntryList, configElement, "");
-            this.btnPlayer = new GuiButtonExt(0, owningEntryList.controlWidth, 0, owningEntryList.controlWidth / 2 - 2, 18, "Player");
-            this.btnEntity = new GuiButtonExt(0, owningEntryList.controlWidth, 0, owningEntryList.controlWidth / 2 - 2, 18, "Entity");
+            this.btnPlayer = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2, 18, "Player");
+            this.btnEntity = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2, 18, "Entity");
         }
 
         @Override
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
             super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
 
-            btnPlayer.width = this.owningEntryList.controlWidth / 2 - 2;
+            btnPlayer.width = ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2;
             btnPlayer.xPosition = listWidth / 4;
             btnPlayer.yPosition = y;
             btnPlayer.drawButton(mc, mouseX, mouseY);
 
-            btnEntity.width = this.owningEntryList.controlWidth / 2 - 2;
-            btnEntity.xPosition = listWidth / 4 + owningEntryList.controlWidth / 2 + 2;
+            btnEntity.width = ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2;
+            btnEntity.xPosition = listWidth / 4 + ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 + 2;
             btnEntity.yPosition = y;
             btnEntity.drawButton(mc, mouseX, mouseY);
         }
@@ -77,7 +77,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
 
         public FixedMobArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
             super(owningScreen, owningEntryList, configElement, value);
-            btnValue = new GuiButtonExt(0, owningEntryList.controlWidth, 0, owningEntryList.controlWidth, 18,
+            btnValue = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 18,
                     value.toString());
             currentValue = value.toString();
             this.selectableValues = getSelectableValues();
@@ -128,7 +128,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
             super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
 
-            btnValue.width = this.owningEntryList.controlWidth;
+            btnValue.width = ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth;
             btnValue.xPosition = listWidth / 4;
             btnValue.yPosition = y;
             btnValue.drawButton(mc, mouseX, mouseY);
@@ -150,7 +150,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
 
         public FixedPlayerArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
             super(owningScreen, owningEntryList, configElement, value);
-            this.textFieldValue = new GuiTextField(0, owningEntryList.mc.fontRendererObj, owningEntryList.width / 4 + 1, 0, owningEntryList.controlWidth - 3, 16);
+            this.textFieldValue = new GuiTextField(0, owningEntryList.mc.fontRendererObj, owningEntryList.width / 4 + 1, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth - 3, 16);
             this.textFieldValue.setMaxStringLength(10000);
             this.textFieldValue.setText(value.toString());
         }

@@ -27,4 +27,12 @@ public class FixedMobEntry extends GuiConfigEntries.ArrayEntry {
     public boolean isDefault() {
         return Arrays.asList(currentValues).isEmpty();
     }
+
+    @Override
+    public void setToDefault() {
+        if (enabled()) {
+            this.currentValues = new Object[0];
+            updateValueButtonText();
+        }
+    }
 }

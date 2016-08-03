@@ -150,7 +150,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
 
         public FixedPlayerArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
             super(owningScreen, owningEntryList, configElement, value);
-            this.textFieldValue = new GuiTextField(0, owningEntryList.mc.fontRendererObj, owningEntryList.width / 4 + 1, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth - 3, 16);
+            this.textFieldValue = new GuiTextField(0, mc.fontRendererObj, owningEntryList.width / 4 + 1, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth - 3, 16);
             this.textFieldValue.setMaxStringLength(10000);
             this.textFieldValue.setText(value.toString());
         }

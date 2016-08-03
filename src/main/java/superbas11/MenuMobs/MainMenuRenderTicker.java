@@ -450,7 +450,17 @@ public class MainMenuRenderTicker {
     }
 
     public boolean isMainMenu(GuiScreen gui) {
-        return gui instanceof GuiMainMenu ||
-                gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
+        boolean flag;
+
+        if (gui == null)
+            return false;
+        else{
+            try {
+                flag = gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
+            }catch (Exception e){
+                flag = false;
+            }
+            return gui instanceof GuiMainMenu || flag;
+        }
     }
 }

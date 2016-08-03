@@ -17,6 +17,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.*;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
@@ -260,6 +261,9 @@ public class MainMenuRenderTicker {
                 ent.setHeldItem(EnumHand.MAIN_HAND, playerItems[random.nextInt(playerItems.length)]);
             else if (ent instanceof EntityPigZombie)
                 ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
+            else if (ent instanceof EntityVillager) {
+                ((EntityVillager) ent).setProfession(random.nextInt(5));
+            }
             else if (ent instanceof EntitySkeleton) {
                 switch (random.nextInt(3)) {
                     case 0:

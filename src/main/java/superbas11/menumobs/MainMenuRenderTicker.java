@@ -2,6 +2,9 @@ package superbas11.menumobs;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
+import com.setycz.chickens.ChickensRegistry;
+import com.setycz.chickens.ChickensRegistryItem;
+import com.setycz.chickens.chicken.EntityChickensChicken;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -17,10 +20,14 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.*;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.passive.HorseType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.EnumPacketDirection;
@@ -31,6 +38,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -55,6 +63,7 @@ public class MainMenuRenderTicker {
     private static List<SimpleEntry<UUID, String>> fallbackPlayerNames;
     private static ItemStack[] playerItems;
     private static ItemStack[] zombieItems;
+    private static ItemStack[] horseArmors;
     private static ItemStack[] skelItems;
     private static Random random = new Random();
     private static String[] entStrings;
@@ -172,6 +181,10 @@ public class MainMenuRenderTicker {
                 new ItemStack(Items.BOW), new ItemStack(Items.BOW), new ItemStack(Items.BOW)
         };
 
+        horseArmors = new ItemStack[]{
+                new ItemStack(Items.IRON_HORSE_ARMOR), new ItemStack(Items.GOLDEN_HORSE_ARMOR), new ItemStack(Items.DIAMOND_HORSE_ARMOR)
+        };
+
         // Get a COPY dumbass!
         Set entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
         entities.removeAll(entityBlacklist);
@@ -263,8 +276,32 @@ public class MainMenuRenderTicker {
                 ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
             else if (ent instanceof EntityVillager) {
                 ((EntityVillager) ent).setProfession(random.nextInt(5));
+            } else if (ent instanceof EntityHorse) {
+                ((EntityHorse) ent).setType(HorseType.getArmorType(random.nextInt(5)));
+
+                switch (((EntityHorse) ent).getType()) {
+                    case HORSE:
+                        int baseColor = random.nextInt(7);
+                        int markings = random.nextInt(5);
+                        ((EntityHorse) ent).setHorseVariant(baseColor | markings << 8);
+
+                        if (random.nextInt(2) == 10) {
+                            ((EntityHorse) ent).setHorseSaddled(true);
+                            ((EntityHorse) ent).setHorseArmorStack(horseArmors[random.nextInt(horseArmors.length)]);
+                        }
+                        break;
+                    case DONKEY:
+                    case MULE:
+                        ((EntityHorse) ent).setChested(random.nextInt(2) == 1);
+                }
+            } else if (ent instanceof EntitySheep) {
+                ((EntitySheep) ent).setFleeceColor(EnumDyeColor.values()[random.nextInt(EnumDyeColor.values().length)]);
             }
-            else if (ent instanceof EntitySkeleton) {
+            //Chicken mod integration.
+            else if (Loader.isModLoaded("chickens") && ent instanceof EntityChickensChicken) {
+                List<Integer> chickens = getChickenTypes(ChickensRegistry.getItems());
+                ((EntityChickensChicken) ent).setChickenType(chickens.get(random.nextInt(chickens.size())));
+            } else if (ent instanceof EntitySkeleton) {
                 switch (random.nextInt(3)) {
                     case 0:
                         ((EntitySkeleton) ent).func_189768_a(SkeletonType.WITHER);
@@ -308,6 +345,15 @@ public class MainMenuRenderTicker {
 
     public static String[] getEntStrings() {
         return entStrings;
+    }
+
+    @Optional.Method(modid = "chickens")
+    private static List<Integer> getChickenTypes(Collection<ChickensRegistryItem> chickens) {
+        List<Integer> result = new ArrayList<Integer>();
+        for (ChickensRegistryItem chicken : chickens) {
+            result.add(chicken.getId());
+        }
+        return result;
     }
 
     @SubscribeEvent
@@ -458,10 +504,10 @@ public class MainMenuRenderTicker {
 
         if (gui == null)
             return false;
-        else{
+        else {
             try {
                 flag = gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
-            }catch (Exception e){
+            } catch (Exception e) {
                 flag = false;
             }
             return gui instanceof GuiMainMenu || flag;

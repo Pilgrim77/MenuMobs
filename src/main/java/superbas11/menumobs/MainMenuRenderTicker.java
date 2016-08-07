@@ -20,10 +20,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.*;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.passive.HorseType;
+import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
@@ -108,6 +105,7 @@ public class MainMenuRenderTicker {
         entityBlacklist.add("TwilightForest.Upper Goblin Knight");
         entityBlacklist.add("graves.playerzombie");
         entityBlacklist.add("headcrumbs.Human");
+        entityBlacklist.add("thuttech.thuttechlift");
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
         // UUIDs gotten using mctools.connorlinfoot.com
@@ -268,14 +266,45 @@ public class MainMenuRenderTicker {
         return entity;
     }
 
+    private static void setRandomMobProperties(EntityLivingBase ent) {
+
+//        if (ent instanceof EntityAgeable && random.nextBoolean())
+//            ((EntityAgeable) ent).setGrowingAge(-1);
+
+        if (ent instanceof EntitySheep)
+            ((EntitySheep) ent).setFleeceColor(EnumDyeColor.values()[random.nextInt(EnumDyeColor.values().length)]);
+
+        else if (ent instanceof EntityVillager)
+            ((EntityVillager) ent).setProfession(random.nextInt(5));
+
+        else if (ent instanceof EntityRabbit) {
+            int i = random.nextInt(13);
+            ((EntityRabbit) ent).setRabbitType(i < 12 ? (i % 2 == 0 ? i / 2 : (i - 1) / 2) : 99);
+        }
+
+        //Chicken mod integration.
+        else if (Loader.isModLoaded("chickens") && ent instanceof EntityChickensChicken) {
+            List<Integer> chickens = getChickenTypes(ChickensRegistry.getItems());
+            ((EntityChickensChicken) ent).setChickenType(chickens.get(random.nextInt(chickens.size())));
+        }
+    }
+
     private static void setRandomMobItem(EntityLivingBase ent) {
         try {
+
             if (ent instanceof AbstractClientPlayer)
                 ent.setHeldItem(EnumHand.MAIN_HAND, playerItems[random.nextInt(playerItems.length)]);
+
             else if (ent instanceof EntityPigZombie)
                 ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-            else if (ent instanceof EntityVillager) {
-                ((EntityVillager) ent).setProfession(random.nextInt(5));
+
+            else if (ent instanceof EntityZombie)
+                ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
+
+            else if (ent instanceof EntityEnderman) {
+                Object[] blocks = EntityEnderman.CARRIABLE_BLOCKS.toArray();
+                IBlockState block = ((Block) blocks[random.nextInt(blocks.length)]).getDefaultState();
+                ((EntityEnderman) ent).setHeldBlockState(block);
             } else if (ent instanceof EntityHorse) {
                 ((EntityHorse) ent).setType(HorseType.getArmorType(random.nextInt(5)));
 
@@ -285,22 +314,15 @@ public class MainMenuRenderTicker {
                         int markings = random.nextInt(5);
                         ((EntityHorse) ent).setHorseVariant(baseColor | markings << 8);
 
-                        if (random.nextInt(2) == 10) {
+                        if (random.nextBoolean()) {
                             ((EntityHorse) ent).setHorseSaddled(true);
                             ((EntityHorse) ent).setHorseArmorStack(horseArmors[random.nextInt(horseArmors.length)]);
                         }
                         break;
                     case DONKEY:
                     case MULE:
-                        ((EntityHorse) ent).setChested(random.nextInt(2) == 1);
+                        ((EntityHorse) ent).setChested(random.nextBoolean());
                 }
-            } else if (ent instanceof EntitySheep) {
-                ((EntitySheep) ent).setFleeceColor(EnumDyeColor.values()[random.nextInt(EnumDyeColor.values().length)]);
-            }
-            //Chicken mod integration.
-            else if (Loader.isModLoaded("chickens") && ent instanceof EntityChickensChicken) {
-                List<Integer> chickens = getChickenTypes(ChickensRegistry.getItems());
-                ((EntityChickensChicken) ent).setChickenType(chickens.get(random.nextInt(chickens.size())));
             } else if (ent instanceof EntitySkeleton) {
                 switch (random.nextInt(3)) {
                     case 0:
@@ -316,12 +338,6 @@ public class MainMenuRenderTicker {
                         ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
                         break;
                 }
-            } else if (ent instanceof EntityZombie)
-                ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
-            else if (ent instanceof EntityEnderman) {
-                Object[] blocks = EntityEnderman.CARRIABLE_BLOCKS.toArray();
-                IBlockState block = ((Block) blocks[random.nextInt(blocks.length)]).getDefaultState();
-                ((EntityEnderman) ent).setHeldBlockState(block);
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -442,7 +458,7 @@ public class MainMenuRenderTicker {
                 for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
                     ModelParts |= enumplayermodelparts.getPartMask();
                 }
-                mcClient.thePlayer.getDataManager().set(mcClient.thePlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
+                mcClient.thePlayer.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
                 mcClient.thePlayer.setPrimaryHand(mcClient.gameSettings.mainHand);
                 mcClient.thePlayer.dimension = 0;
                 mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
@@ -461,7 +477,9 @@ public class MainMenuRenderTicker {
                     randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
                 }
                 if (randMob instanceof EntityPlayer)
-                    randMob.getDataManager().set(((EntityPlayer) randMob).PLAYER_MODEL_FLAG, Byte.valueOf((byte) 127));
+                    randMob.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) 127));
+
+                setRandomMobProperties(randMob);
                 setRandomMobItem(randMob);
             }
 

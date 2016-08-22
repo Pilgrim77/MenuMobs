@@ -12,7 +12,6 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-        classpath  files("libs/")
     }
 }
 
@@ -85,4 +84,8 @@ jar {
 // change the name of my obfuscated jar
 jar {
     appendix = config.appendix
+}
+
+dependencies {
+    compile files('libs/')
 }

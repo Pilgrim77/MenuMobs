@@ -385,6 +385,10 @@ public class MainMenuRenderTicker {
                 if ((mcClient.thePlayer == null) || (mcClient.thePlayer.worldObj == null) || (randMob == null))
                     init();
 
+                //In cause of someone resetting the renderer. cough cough... schematica...
+                if (mcClient.getRenderManager().worldObj == null || mcClient.getRenderManager().renderViewEntity == null)
+                    mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, mcClient.thePlayer, mcClient.gameSettings, 0.0F);
+
                 if ((world != null) && (mcClient.thePlayer != null) && (randMob != null)) {
                     ScaledResolution sr = new ScaledResolution(mcClient);
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;

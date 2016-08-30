@@ -192,6 +192,7 @@ public class MainMenuRenderTicker {
 
     private World world;
     private EntityLivingBase randMob;
+    private EntityPlayerSP player;
 
     public MainMenuRenderTicker() {
         mcClient = FMLClientHandler.instance().getClient();
@@ -382,10 +383,11 @@ public class MainMenuRenderTicker {
 
         if (MenuMobs.instance.showMainMenuMobs && !erroredOut && isMainMenu(mcClient.currentScreen)) {
             try {
-                if ((mcClient.thePlayer == null) || (mcClient.thePlayer.worldObj == null) || (randMob == null))
+                if ((player == null) || (player.worldObj == null) || (randMob == null))
                     init();
 
-                if ((world != null) && (mcClient.thePlayer != null) && (randMob != null)) {
+                if ((world != null) && (player != null) && (randMob != null)) {
+                    mcClient.thePlayer = player;
                     ScaledResolution sr = new ScaledResolution(mcClient);
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
@@ -401,20 +403,21 @@ public class MainMenuRenderTicker {
                             randMob);
                     EntityUtils.drawEntityOnScreen(
                             sr.getScaledWidth() - distanceToSide,
-                            (int) ((sr.getScaledHeight() / 2) + (mcClient.thePlayer.height * targetHeight)),
+                            (int) ((sr.getScaledHeight() / 2) + (player.height * targetHeight)),
                             targetHeight,
                             sr.getScaledWidth() - distanceToSide - mouseX,
-                            ((sr.getScaledHeight() / 2) + (mcClient.thePlayer.height * targetHeight)) - (mcClient.thePlayer.height * targetHeight * (mcClient.thePlayer.getEyeHeight() / mcClient.thePlayer.height)) - mouseY,
-                            mcClient.thePlayer);
+                            ((sr.getScaledHeight() / 2) + (player.height * targetHeight)) - (player.height * targetHeight * (player.getEyeHeight() / player.height)) - mouseY,
+                            player);
                 }
             } catch (Throwable e) {
                 LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
                 e.printStackTrace();
                 erroredOut = true;
-                mcClient.thePlayer = null;
+                player = null;
                 randMob = null;
                 world = null;
             }
+            mcClient.thePlayer = null;
         }
     }
 
@@ -423,7 +426,7 @@ public class MainMenuRenderTicker {
         if (world != null && randMob != null && event.phase == TickEvent.Phase.START) {
 
             world.updateEntity(randMob);
-            world.updateEntity(mcClient.thePlayer);
+            world.updateEntity(player);
 
             if (randMob instanceof EntityLiving && ConfigElements.MOB_SOUNDS_VOLUME.getSetting().getDouble() > 0.0F) {
                 if (randMob.isEntityAlive() && this.random.nextInt(1000) < ((EntityLiving) randMob).livingSoundTime++) {
@@ -442,8 +445,8 @@ public class MainMenuRenderTicker {
             if (createNewWorld)
                 world = new FakeWorld(worldInfo);
 
-            if (createNewWorld || (mcClient.thePlayer == null)) {
-                mcClient.thePlayer = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
+            if (createNewWorld || (player == null)) {
+                player = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
                     @Override
                     public NetworkPlayerInfo getPlayerInfo(UUID uniqueId) {
                         return new NetworkPlayerInfo(mcClient.getSession().getProfile());
@@ -458,12 +461,12 @@ public class MainMenuRenderTicker {
                 for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
                     ModelParts |= enumplayermodelparts.getPartMask();
                 }
-                mcClient.thePlayer.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
-                mcClient.thePlayer.setPrimaryHand(mcClient.gameSettings.mainHand);
-                mcClient.thePlayer.dimension = 0;
-                mcClient.thePlayer.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
-                mcClient.thePlayer.eyeHeight = 1.82F;
-                setRandomMobItem(mcClient.thePlayer);
+                player.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
+                player.setPrimaryHand(mcClient.gameSettings.mainHand);
+                player.dimension = 0;
+                player.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
+                player.eyeHeight = 1.82F;
+                setRandomMobItem(player);
             }
 
             if (createNewWorld || (randMob == null)) {
@@ -483,12 +486,12 @@ public class MainMenuRenderTicker {
                 setRandomMobItem(randMob);
             }
 
-            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, mcClient.thePlayer, mcClient.gameSettings, 0.0F);
+            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
         } catch (Throwable e) {
             LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
             e.printStackTrace();
             erroredOut = true;
-            mcClient.thePlayer = null;
+            player = null;
             randMob = null;
             world = null;
         }
@@ -509,7 +512,7 @@ public class MainMenuRenderTicker {
             isRegistered = false;
             randMob = null;
             world = null;
-            mcClient.thePlayer = null;
+            player = null;
         }
     }
 

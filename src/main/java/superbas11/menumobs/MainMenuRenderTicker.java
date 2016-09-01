@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -30,6 +31,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MovementInputFromOptions;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
@@ -390,9 +392,14 @@ public class MainMenuRenderTicker {
                     mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, mcClient.thePlayer, mcClient.thePlayer, mcClient.gameSettings, 0.0F);
 
                 if ((world != null) && (mcClient.thePlayer != null) && (randMob != null)) {
+
                     ScaledResolution sr = new ScaledResolution(mcClient);
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
+
+                    drawBlacklistButton(mouseX,mouseY);
+
+                    //Draw entities
                     int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
                     float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
                     float scale = EntityUtils.getEntityScale(randMob, targetHeight, 1.8F);
@@ -419,6 +426,15 @@ public class MainMenuRenderTicker {
                 randMob = null;
                 world = null;
             }
+        }
+    }
+
+    private void drawBlacklistButton(int mouseX, int mouseY){
+        //Blacklist button
+        mcClient.getTextureManager().bindTexture(new ResourceLocation("fml:textures/gui/icons.png"));
+        Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
+        if(mouseX<8 && mouseY<8){
+            mcClient.currentScreen.drawString(mcClient.fontRendererObj,"Add mob to blacklist",mouseX,mouseY,-6250336);
         }
     }
 

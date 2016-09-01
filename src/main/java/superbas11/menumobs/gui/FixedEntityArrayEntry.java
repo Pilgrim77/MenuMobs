@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntry {
+    private static Map<Object, String> selectableValues = FixedMobArrayEntry.getSelectableValues();
     protected Minecraft mc;
 
     public FixedEntityArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
@@ -58,7 +59,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
                 return true;
             } else if (btnEntity.mousePressed(mc, x, y)) {
                 btnPlayer.playPressSound(mc.getSoundHandler());
-                mc.displayGuiScreen(new GuiSelectFixedMob(this.owningScreen, configElement, index, FixedMobArrayEntry.getSelectableValues(), "", true));
+                mc.displayGuiScreen(new GuiSelectFixedMob(this.owningScreen, configElement, index, selectableValues, "", true));
                 return true;
             } else
                 return super.mousePressed(index, x, y, mouseEvent, relativeX, relativeY);
@@ -73,27 +74,25 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
     public static class FixedMobArrayEntry extends FixedEntityArrayEntry {
         protected GuiButtonExt btnValue;
         protected Object currentValue;
-        protected Map<Object, String> selectableValues;
 
         public FixedMobArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
             super(owningScreen, owningEntryList, configElement, value);
             btnValue = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 18,
                     value.toString());
             currentValue = value.toString();
-            this.selectableValues = getSelectableValues();
             updateValueButtonText();
         }
 
         protected static Map<Object, String> getSelectableValues() {
             Map<Object, String> selectableValues = new TreeMap<Object, String>();
             Class clazz;
-            for (String mob : MainMenuRenderTicker.getEntStrings()) {
-                clazz = (Class) EntityList.NAME_TO_CLASS.get(mob);
+            String[] mobName;
+            for (String mobID : MainMenuRenderTicker.getEntStrings()) {
+                clazz = (Class) EntityList.NAME_TO_CLASS.get(mobID);
+                mobName = mobID.split("\\.");
                 if (EntityLivingBase.class.isAssignableFrom(clazz))
-                    selectableValues.put(mob, mob);
-
+                    selectableValues.put(mobID, mobName[mobName.length-1]);
             }
-
             return selectableValues;
         }
 
@@ -142,6 +141,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         public boolean enabled() {
             return this.owningEntryList.getEnabled();
         }
+
     }
 
     public static class FixedPlayerArrayEntry extends FixedEntityArrayEntry {

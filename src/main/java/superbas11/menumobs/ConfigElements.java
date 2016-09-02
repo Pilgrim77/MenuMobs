@@ -14,6 +14,7 @@ public enum ConfigElements {
     SHOW_ONLY_PLAYER_MODELS("showOnlyPlayerModels", "superbas11.configgui.showOnlyPlayerModels", "false", BOOLEAN),
     MOB_SOUNDS_VOLUME("mobSoundVolume", "superbas11.configgui.mobSoundVolume", "0.5", DOUBLE, 0.0F, 1.0F, VolumeSliderEntry.class),
     FIXED_MOB("fixedMob", "superbas11.configgui.fixedMob", new String[]{}, STRING, FixedMobEntry.class),
+    BLACKLIST("blacklist", "superbas11.configgui.blacklist",new String[]{}, STRING),
     ALLOW_DEBUG_OUTPUT("allowDebugOutput", "superbas11.configgui.allowDebugOutput", "false", BOOLEAN);
 
     private String key;
@@ -25,6 +26,13 @@ public enum ConfigElements {
     private Class<? extends GuiConfigEntries.IConfigEntry> EntryClass;
 
     ConfigElements(String key, String langKey, String defaultString, Property.Type propertyType) {
+        this.key = key;
+        this.langKey = langKey;
+        this.propertyType = propertyType;
+        this.Setting = Reference.config.get(Configuration.CATEGORY_GENERAL, key, defaultString, I18n.format(langKey + ".tooltip"), propertyType).setLanguageKey(langKey);
+    }
+
+    ConfigElements(String key, String langKey, String[] defaultString, Property.Type propertyType) {
         this.key = key;
         this.langKey = langKey;
         this.propertyType = propertyType;

@@ -36,6 +36,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.common.Loader;
@@ -450,8 +451,11 @@ public class MainMenuRenderTicker {
             ScaledResolution sr = new ScaledResolution(mcClient);
             int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
             int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
-            if(mouseX < 8 && mouseY < 8)
-                LogHelper.info("click");
+            if(mouseX < 8 && mouseY < 8){
+                Set<String> blacklist = new HashSet<String>(Arrays.asList(ConfigElements.BLACKLIST.getSetting().getStringList()));
+                blacklist.add(randMob.getName());
+                ConfigElements.BLACKLIST.getSetting().set(blacklist.toArray(new String[]{}));
+            }
         }
     }
 

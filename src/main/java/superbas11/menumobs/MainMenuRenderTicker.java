@@ -34,14 +34,18 @@ import net.minecraft.util.MovementInputFromOptions;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.logging.Log;
 import org.lwjgl.input.Mouse;
 import superbas11.menumobs.client.util.EntityUtils;
 import superbas11.menumobs.client.util.UUIDFetcher;
@@ -374,6 +378,14 @@ public class MainMenuRenderTicker {
         return result;
     }
 
+    private void drawBlacklistButton(int mouseX, int mouseY){
+        //Blacklist button
+        mcClient.getTextureManager().bindTexture(new ResourceLocation("fml:textures/gui/icons.png"));
+        Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
+        if(mouseX<8 && mouseY<8)
+            GuiUtils.drawHoveringText(Collections.singletonList("Add mob to the blacklist"),mouseX,mouseY+20,mcClient.currentScreen.width,mcClient.currentScreen.height,mcClient.currentScreen.width/2,mcClient.fontRendererObj);
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.RenderTickEvent event) {
         if (Loader.isModLoaded("WorldStateCheckpoints")) {
@@ -397,7 +409,8 @@ public class MainMenuRenderTicker {
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
 
-                    drawBlacklistButton(mouseX,mouseY);
+                    if(!(randMob instanceof EntityOtherPlayerMP))
+                        drawBlacklistButton(mouseX,mouseY);
 
                     //Draw entities
                     int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
@@ -429,12 +442,14 @@ public class MainMenuRenderTicker {
         }
     }
 
-    private void drawBlacklistButton(int mouseX, int mouseY){
-        //Blacklist button
-        mcClient.getTextureManager().bindTexture(new ResourceLocation("fml:textures/gui/icons.png"));
-        Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
-        if(mouseX<8 && mouseY<8){
-            mcClient.currentScreen.drawString(mcClient.fontRendererObj,"Add mob to blacklist",mouseX,mouseY,-6250336);
+    @SubscribeEvent
+    public void onMouseClick(GuiScreenEvent.MouseInputEvent.Post event){
+        if(Mouse.getEventButtonState() && Mouse.getEventButton() == 0){
+            ScaledResolution sr = new ScaledResolution(mcClient);
+            int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
+            int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
+            if(mouseX < 8 && mouseY < 8)
+                LogHelper.info("click");
         }
     }
 

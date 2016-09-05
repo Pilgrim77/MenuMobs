@@ -17,7 +17,7 @@ import java.util.TreeMap;
 public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntry {
     protected Minecraft mc;
 
-    public FixedEntityArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
+    public FixedEntityArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement) {
         super(owningScreen, owningEntryList, configElement);
         this.mc = Minecraft.getMinecraft();
     }
@@ -30,7 +30,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         protected GuiButtonExt btnEntity;
 
         public FixedEntityOptionEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement) {
-            super(owningScreen, owningEntryList, configElement, "");
+            super(owningScreen, owningEntryList, configElement);
             this.btnPlayer = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2, 18, "Player");
             this.btnEntity = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2, 18, "Entity");
         }
@@ -76,7 +76,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         protected Map<Object, String> selectableValues;
 
         public FixedMobArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
-            super(owningScreen, owningEntryList, configElement, value);
+            super(owningScreen, owningEntryList, configElement);
             btnValue = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 18,
                     value.toString());
             currentValue = value.toString();
@@ -149,7 +149,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         protected boolean enabled = true;
 
         public FixedPlayerArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
-            super(owningScreen, owningEntryList, configElement, value);
+            super(owningScreen, owningEntryList, configElement);
             this.textFieldValue = new GuiTextField(0, mc.fontRendererObj, owningEntryList.width / 4 + 1, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth - 3, 16);
             this.textFieldValue.setMaxStringLength(10000);
             this.textFieldValue.setText(value.toString());

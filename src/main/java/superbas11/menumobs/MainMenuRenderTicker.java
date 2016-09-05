@@ -383,15 +383,17 @@ public class MainMenuRenderTicker {
 
     private void drawBlacklistButton(int mouseX, int mouseY) {
         mcClient.getTextureManager().bindTexture(new ResourceLocation("fml:textures/gui/icons.png"));
+        GlStateManager.disableDepth();
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
         if (mouseX < 8 && mouseY < 8)
             GuiUtils.drawHoveringText(Collections.singletonList("Add mob to the blacklist"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
+        GlStateManager.disableLighting();
     }
 
     private void drawNextButton(int mouseX, int mouseY) {
         int XOffset = 9;
         mcClient.getTextureManager().bindTexture(new ResourceLocation("textures/gui/world_selection.png"));
-        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
 
         if (randMob instanceof EntityOtherPlayerMP)
             XOffset = 0;
@@ -399,6 +401,7 @@ public class MainMenuRenderTicker {
         if (mouseX > XOffset && mouseX < 6 + XOffset && mouseY < 8) {
             Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 14, 6, 9, 96, 96);
             GuiUtils.drawHoveringText(Collections.singletonList("Next mob"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
+            GlStateManager.disableLighting();
         } else
             Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 2, 6, 9, 96, 96);
     }
@@ -426,10 +429,6 @@ public class MainMenuRenderTicker {
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
 
-                    if (!(randMob instanceof EntityOtherPlayerMP))
-                        drawBlacklistButton(mouseX, mouseY);
-                    drawNextButton(mouseX, mouseY);
-
                     //Draw entities
                     int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
                     float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
@@ -448,6 +447,12 @@ public class MainMenuRenderTicker {
                             sr.getScaledWidth() - distanceToSide - mouseX,
                             ((sr.getScaledHeight() / 2) + (player.height * targetHeight)) - (player.height * targetHeight * (player.getEyeHeight() / player.height)) - mouseY,
                             player);
+
+
+                    //Draw buttons
+                    if (!(randMob instanceof EntityOtherPlayerMP))
+                        drawBlacklistButton(mouseX, mouseY);
+                    drawNextButton(mouseX, mouseY);
                 }
             } catch (Throwable e) {
                 LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");

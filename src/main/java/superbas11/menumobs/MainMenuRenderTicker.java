@@ -467,13 +467,18 @@ public class MainMenuRenderTicker {
             ScaledResolution sr = new ScaledResolution(mcClient);
             int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
             int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
-            if (mouseX < 8 && mouseY < 8 && !(randMob instanceof EntityOtherPlayerMP)) {
+            boolean isPlayer = randMob instanceof EntityOtherPlayerMP;
+
+            //Blacklist button
+            if (mouseX < 8 && mouseY < 8 && !isPlayer) {
                 Set<String> blacklist = new HashSet<String>(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
                 blacklist.add(EntityList.getEntityString(randMob));
                 MenuMobs.instance.blacklist.set(blacklist.toArray(new String[]{}));
                 randMob = null;
-            } else if (mouseX < 8 && mouseY < 8) {
-                LogHelper.info("Click!");
+            }
+            //Next button
+            else if ((mouseX < 8 && isPlayer || (mouseX > 9 && mouseX < 15 && !isPlayer)) && mouseY < 8) {
+                randMob = null;
             }
         }
     }
@@ -484,9 +489,6 @@ public class MainMenuRenderTicker {
 
             world.updateEntity(randMob);
             world.updateEntity(player);
-
-            if (entityBlacklist.contains(null))
-                LogHelper.severe("Error!");
 
             if (randMob instanceof EntityLiving && MenuMobs.instance.mobSoundVolume > 0.0F) {
                 if (randMob.isEntityAlive() && this.random.nextInt(1000) < ((EntityLiving) randMob).livingSoundTime++) {

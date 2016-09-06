@@ -52,12 +52,17 @@ public class MenuMobs {
         List<String> orderedKeys = new ArrayList<String>(ConfigElements.values().length);
 
         showMainMenuMobs = Reference.config.getBoolean(ConfigElements.SHOW_MAIN_MENU_MOBS.key(), ctgyGen, true, ConfigElements.SHOW_MAIN_MENU_MOBS.desc(), ConfigElements.SHOW_MAIN_MENU_MOBS.languageKey());
+        orderedKeys.add(ConfigElements.SHOW_MAIN_MENU_MOBS.key());
         showOnlyPlayerModels = Reference.config.getBoolean(ConfigElements.SHOW_ONLY_PLAYER_MODELS.key(), ctgyGen, false, ConfigElements.SHOW_ONLY_PLAYER_MODELS.desc(), ConfigElements.SHOW_ONLY_PLAYER_MODELS.languageKey());
+        orderedKeys.add(ConfigElements.SHOW_ONLY_PLAYER_MODELS.key());
         mobSoundVolume = Reference.config.get(ctgyGen, ConfigElements.MOB_SOUNDS_VOLUME.key(), 0.5f, ConfigElements.MOB_SOUNDS_VOLUME.desc(), 0.0F, 1.0F).setConfigEntryClass(VolumeSliderEntry.class).getDouble();
+        orderedKeys.add(ConfigElements.MOB_SOUNDS_VOLUME.key());
         fixedMob = Reference.config.get(ctgyGen, ConfigElements.FIXED_MOB.key(), new String[]{}, ConfigElements.FIXED_MOB.desc(), STRING).setConfigEntryClass(FixedMobEntry.class).getStringList();
+        orderedKeys.add(ConfigElements.FIXED_MOB.key());
         blacklist = Reference.config.get(ctgyGen, ConfigElements.BLACKLIST.key(), new String[]{}, ConfigElements.BLACKLIST.desc(), STRING).setArrayEntryClass(BlacklistArrayEntry.class);
+        orderedKeys.add(ConfigElements.BLACKLIST.key());
         allowDebugOutput = Reference.config.getBoolean(ConfigElements.ALLOW_DEBUG_OUTPUT.key(), ctgyGen, false, ConfigElements.SHOW_MAIN_MENU_MOBS.desc(), ConfigElements.ALLOW_DEBUG_OUTPUT.languageKey());
-
+        orderedKeys.add(ConfigElements.ALLOW_DEBUG_OUTPUT.key());
 
         Reference.config.setCategoryPropertyOrder(ctgyGen, orderedKeys);
 

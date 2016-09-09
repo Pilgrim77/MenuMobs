@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.config.GuiSelectString;
 import net.minecraftforge.fml.client.config.GuiSelectStringEntries;
 import net.minecraftforge.fml.client.config.IConfigElement;
@@ -66,10 +67,9 @@ public class GuiSelectFixedMob extends GuiSelectString {
                 String slotValue = entry.getKey().toString();
                 if (slotValue.contains(".") && !slotValue.contains(lastCategory)) {
                     lastCategory = slotValue.split("\\.")[0];
-                    Integer[] test = new Integer[]{(index + 1) * this.slotHeight - this.top - this.headerPadding + (categories.size()) * 22 + 8};
                     categories.put(lastCategory,
                             new Integer[]{
-                                    (index + 1) * this.slotHeight - this.top - this.headerPadding + (categories.size()) * 22 + 8,
+                                    index * this.slotHeight + this.headerPadding + categories.size() * 18 - 4,
                                     categories.size() + 1
                             });
                 }
@@ -149,25 +149,27 @@ public class GuiSelectFixedMob extends GuiSelectString {
         @Override
         public void handleMouseInput() {
             if (this.isMouseYWithinSlotBounds(this.mouseY)) {
+
+                int k = this.mouseY - this.top - this.headerPadding + (int) this.amountScrolled - 4;
+                int categoryOffset = 0;
+                int categoryNumber = 0;
+
+                for (Map.Entry<String, Integer[]> category : categories.entrySet()) {
+                    if (category.getValue()[0] < k && (category.getValue()[0] > categoryOffset || categoryOffset == 0)) {
+                        categoryOffset = category.getValue()[0];
+                        categoryNumber = category.getValue()[1];
+                    }
+                }
+
+                int l;
+                if (k < (categoryOffset + 18) && categoryOffset != 0)
+                    l = -1;
+                else
+                    l = (k - categoryNumber * 18) / this.slotHeight;
+
                 if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() && this.mouseY >= this.top && this.mouseY <= this.bottom) {
                     int i = (this.width - this.getListWidth()) / 2;
                     int j = (this.width + this.getListWidth()) / 2;
-                    int k = this.mouseY - this.top - this.headerPadding + (int) this.amountScrolled - 4;
-                    int categoryOffset = 0;
-                    int categoryNumber = 0;
-
-                    for (Map.Entry<String, Integer[]> category : categories.entrySet()) {
-                        if (category.getValue()[0] < k && (category.getValue()[0] > categoryOffset || categoryOffset == 0)) {
-                            categoryOffset = category.getValue()[0];
-                            categoryNumber = category.getValue()[1];
-                        }
-                    }
-
-                    int l;
-                    if (k < (categoryOffset + 22) && categoryOffset != 0)
-                        l = -1;
-                    else
-                        l = (k - categoryNumber * 18) / this.slotHeight;
 
                     if (l < this.getSize() && this.mouseX >= i && this.mouseX <= j && l >= 0 && k >= 0) {
                         this.elementClicked(l, false, this.mouseX, this.mouseY);
@@ -177,60 +179,58 @@ public class GuiSelectFixedMob extends GuiSelectString {
                     }
                 }
 
-//                if (Mouse.isButtonDown(0) && this.getEnabled()) {
-//                    if (this.initialClickY == -1) {
-//                        boolean flag1 = true;
-//
-//                        if (this.mouseY >= this.top && this.mouseY <= this.bottom) {
-//                            int j2 = (this.width - this.getListWidth()) / 2;
-//                            int k2 = (this.width + this.getListWidth()) / 2;
-//                            int l2 = this.mouseY - this.top - this.headerPadding + (int) this.amountScrolled - 4;
-//                            int i1 = l2 / this.slotHeight;
-//
-//                            if (i1 < this.getSize() && this.mouseX >= j2 && this.mouseX <= k2 && i1 >= 0 && l2 >= 0) {
-//                                boolean flag = i1 == this.selectedElement && Minecraft.getSystemTime() - this.lastClicked < 250L;
-//                                this.elementClicked(i1, flag, this.mouseX, this.mouseY);
-//                                this.selectedElement = i1;
-//                                this.lastClicked = Minecraft.getSystemTime();
-//                            } else if (this.mouseX >= j2 && this.mouseX <= k2 && l2 < 0) {
-//                                this.clickedHeader(this.mouseX - j2, this.mouseY - this.top + (int) this.amountScrolled - 4);
-//                                flag1 = false;
-//                            }
-//
-//                            int i3 = this.getScrollBarX();
-//                            int j1 = i3 + 6;
-//
-//                            if (this.mouseX >= i3 && this.mouseX <= j1) {
-//                                this.scrollMultiplier = -1.0F;
-//                                int k1 = this.getMaxScroll();
-//
-//                                if (k1 < 1) {
-//                                    k1 = 1;
-//                                }
-//
-//                                int l1 = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getContentHeight());
-//                                l1 = MathHelper.clamp_int(l1, 32, this.bottom - this.top - 8);
-//                                this.scrollMultiplier /= (float) (this.bottom - this.top - l1) / (float) k1;
-//                            } else {
-//                                this.scrollMultiplier = 1.0F;
-//                            }
-//
-//                            if (flag1) {
-//                                this.initialClickY = this.mouseY;
-//                            } else {
-//                                this.initialClickY = -2;
-//                            }
-//                        } else {
-//                            this.initialClickY = -2;
-//                        }
-//                    } else if (this.initialClickY >= 0) {
-//                        this.amountScrolled -= (float) (this.mouseY - this.initialClickY) * this.scrollMultiplier;
-//                        this.initialClickY = this.mouseY;
-//                    }
-//                } else {
-//                    this.initialClickY = -1;
-//                }
-//
+                if (Mouse.isButtonDown(0) && this.getEnabled()) {
+                    if (this.initialClickY == -1) {
+                        boolean flag1 = true;
+
+                        if (this.mouseY >= this.top && this.mouseY <= this.bottom) {
+                            int j2 = (this.width - this.getListWidth()) / 2;
+                            int k2 = (this.width + this.getListWidth()) / 2;
+
+                            if (l < this.getSize() && this.mouseX >= j2 && this.mouseX <= k2 && l >= 0 && k >= 0) {
+                                boolean flag = l == this.selectedElement && Minecraft.getSystemTime() - this.lastClicked < 250L;
+                                //this.elementClicked(i1, flag, this.mouseX, this.mouseY);
+                                //this.selectedElement = i1;
+                                this.lastClicked = Minecraft.getSystemTime();
+                            } else if (this.mouseX >= j2 && this.mouseX <= k2 && k < 0) {
+                                this.clickedHeader(this.mouseX - j2, this.mouseY - this.top + (int) this.amountScrolled - 4);
+                                flag1 = false;
+                            }
+
+                            int i3 = this.getScrollBarX();
+                            int j1 = i3 + 6;
+
+                            if (this.mouseX >= i3 && this.mouseX <= j1) {
+                                this.scrollMultiplier = -1.0F;
+                                int k1 = this.getMaxScroll();
+
+                                if (k1 < 1) {
+                                    k1 = 1;
+                                }
+
+                                int l1 = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getContentHeight());
+                                l1 = MathHelper.clamp_int(l1, 32, this.bottom - this.top - 8);
+                                this.scrollMultiplier /= (float) (this.bottom - this.top - l1) / (float) k1;
+                            } else {
+                                this.scrollMultiplier = 1.0F;
+                            }
+
+                            if (flag1) {
+                                this.initialClickY = this.mouseY;
+                            } else {
+                                this.initialClickY = -2;
+                            }
+                        } else {
+                            this.initialClickY = -2;
+                        }
+                    } else if (this.initialClickY >= 0) {
+                        this.amountScrolled -= (float) (this.mouseY - this.initialClickY) * this.scrollMultiplier;
+                        this.initialClickY = this.mouseY;
+                    }
+                } else {
+                    this.initialClickY = -1;
+                }
+
                 int i2 = Mouse.getEventDWheel();
 
                 if (i2 != 0) {

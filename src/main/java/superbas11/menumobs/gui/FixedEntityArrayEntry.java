@@ -86,10 +86,12 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         protected static Map<Object, String> getSelectableValues() {
             Map<Object, String> selectableValues = new TreeMap<Object, String>();
             Class clazz;
+            String[] mobName;
             for (String mobID : MainMenuRenderTicker.getEntStrings()) {
                 clazz = (Class) EntityList.NAME_TO_CLASS.get(mobID);
+                mobName = mobID.split("\\.");
                 if (EntityLivingBase.class.isAssignableFrom(clazz))
-                    selectableValues.put(mobID, mobID);
+                    selectableValues.put(mobID, mobName[mobName.length - 1]);
             }
             return selectableValues;
         }

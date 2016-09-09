@@ -11,11 +11,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,10 +32,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MovementInputFromOptions;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -56,7 +61,7 @@ import java.util.*;
 public class MainMenuRenderTicker {
     private static Minecraft mcClient;
     private static boolean isRegistered = false;
-    private static List entityBlacklist;
+    private static Set<String> entityBlacklist;
     private static List<SimpleEntry<UUID, String>> fallbackPlayerNames;
     private static ItemStack[] playerItems;
     private static ItemStack[] zombieItems;
@@ -68,7 +73,7 @@ public class MainMenuRenderTicker {
     private static boolean erroredOut = false;
 
     static {
-        entityBlacklist = new ArrayList();
+        entityBlacklist = new HashSet<String>();
         entityBlacklist.add("Mob");
         entityBlacklist.add("Monster");
         entityBlacklist.add("EnderDragon");
@@ -201,26 +206,29 @@ public class MainMenuRenderTicker {
 
     private static EntityLivingBase getNextEntity(World world) {
         Class clazz;
+        String mobName;
+        List blacklist = Arrays.asList(MenuMobs.instance.blacklist.getStringList());
         int tries = 0;
         do {
             if (++id >= entStrings.length)
                 id = 0;
             clazz = (Class) EntityList.NAME_TO_CLASS.get((String) entStrings[id]);
+            mobName = EntityList.getEntityStringFromClass(clazz);
         }
-        while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
+        while (!EntityLivingBase.class.isAssignableFrom(clazz) && !blacklist.contains(mobName) && (++tries <= 5));
 
         //Using a player as fallback.
         if (!EntityLivingBase.class.isAssignableFrom(clazz))
             return getRandomPlayer(world);
 
-        if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
+        if (MenuMobs.instance.allowDebugOutput)
             LogHelper.info(entStrings[id]);
 
         return (EntityLivingBase) EntityList.createEntityByName(entStrings[id], world);
     }
 
     private static EntityLivingBase getFixedEntity(World world) {
-        String[] entityList = ConfigElements.FIXED_MOB.getSetting().getStringList();
+        String[] entityList = MenuMobs.instance.fixedMob;
         EntityLivingBase entity = null;
         Random random = new Random();
         Class clazz;
@@ -262,7 +270,7 @@ public class MainMenuRenderTicker {
             return EntityUtils.getRandomLivingEntity(world, entityBlacklist, 5, fallbackPlayerNames);
         }
 
-        if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
+        if (MenuMobs.instance.allowDebugOutput)
             LogHelper.info(entityList[id]);
 
         return entity;
@@ -374,6 +382,31 @@ public class MainMenuRenderTicker {
         return result;
     }
 
+    private void drawBlacklistButton(int mouseX, int mouseY) {
+        mcClient.getTextureManager().bindTexture(new ResourceLocation("fml:textures/gui/icons.png"));
+        GlStateManager.disableDepth();
+        Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
+        if (mouseX < 8 && mouseY < 8)
+            GuiUtils.drawHoveringText(Collections.singletonList("Add mob to the blacklist"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
+        GlStateManager.disableLighting();
+    }
+
+    private void drawNextButton(int mouseX, int mouseY) {
+        int XOffset = 9;
+        mcClient.getTextureManager().bindTexture(new ResourceLocation("textures/gui/world_selection.png"));
+        GlStateManager.disableDepth();
+
+        if (randMob instanceof EntityOtherPlayerMP)
+            XOffset = 0;
+
+        if (mouseX > XOffset && mouseX < 6 + XOffset && mouseY < 8) {
+            Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 14, 6, 9, 96, 96);
+            GuiUtils.drawHoveringText(Collections.singletonList("Next mob"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
+            GlStateManager.disableLighting();
+        } else
+            Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 2, 6, 9, 96, 96);
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.RenderTickEvent event) {
         if (Loader.isModLoaded("WorldStateCheckpoints")) {
@@ -396,6 +429,8 @@ public class MainMenuRenderTicker {
                     ScaledResolution sr = new ScaledResolution(mcClient);
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
+
+                    //Draw entities
                     int distanceToSide = ((mcClient.currentScreen.width / 2) - 98) / 2;
                     float targetHeight = (float) (sr.getScaledHeight_double() / 5.0F) / 1.8F;
                     float scale = EntityUtils.getEntityScale(randMob, targetHeight, 1.8F);
@@ -413,6 +448,12 @@ public class MainMenuRenderTicker {
                             sr.getScaledWidth() - distanceToSide - mouseX,
                             ((sr.getScaledHeight() / 2) + (player.height * targetHeight)) - (player.height * targetHeight * (player.getEyeHeight() / player.height)) - mouseY,
                             player);
+
+
+                    //Draw buttons
+                    if (!(randMob instanceof EntityOtherPlayerMP))
+                        drawBlacklistButton(mouseX, mouseY);
+                    drawNextButton(mouseX, mouseY);
                 }
             } catch (Throwable e) {
                 LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
@@ -427,6 +468,28 @@ public class MainMenuRenderTicker {
     }
 
     @SubscribeEvent
+    public void onMouseClick(GuiScreenEvent.MouseInputEvent.Post event) {
+        if (Mouse.getEventButtonState() && Mouse.getEventButton() == 0 && randMob != null) {
+            ScaledResolution sr = new ScaledResolution(mcClient);
+            int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
+            int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
+            boolean isPlayer = randMob instanceof EntityOtherPlayerMP;
+
+            //Blacklist button
+            if (mouseX < 8 && mouseY < 8 && !isPlayer) {
+                Set<String> blacklist = new HashSet<String>(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
+                blacklist.add(EntityList.getEntityString(randMob));
+                MenuMobs.instance.blacklist.set(blacklist.toArray(new String[]{}));
+                randMob = null;
+            }
+            //Next button
+            else if ((mouseX < 8 && isPlayer || (mouseX > 9 && mouseX < 15 && !isPlayer)) && mouseY < 8) {
+                randMob = null;
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onGameTick(TickEvent.ClientTickEvent event) {
         if (world != null && randMob != null && player != null && event.phase == TickEvent.Phase.START) {
 
@@ -434,7 +497,7 @@ public class MainMenuRenderTicker {
             world.updateEntity(randMob);
             world.updateEntity(player);
 
-            if (randMob instanceof EntityLiving && ConfigElements.MOB_SOUNDS_VOLUME.getSetting().getDouble() > 0.0F) {
+            if (randMob instanceof EntityLiving && MenuMobs.instance.mobSoundVolume > 0.0F) {
                 if (randMob.isEntityAlive() && this.random.nextInt(1000) < ((EntityLiving) randMob).livingSoundTime++) {
                     ((EntityLiving) randMob).livingSoundTime = -((EntityLiving) randMob).getTalkInterval();
                     ((EntityLiving) randMob).playLivingSound();
@@ -478,14 +541,16 @@ public class MainMenuRenderTicker {
             }
 
             if (createNewWorld || (randMob == null)) {
-                if (ConfigElements.FIXED_MOB.getSetting().getStringList().length > 0)
+                if (MenuMobs.instance.fixedMob.length > 0)
                     randMob = getFixedEntity(world);
-                else if (ConfigElements.SHOW_ONLY_PLAYER_MODELS.getSetting().getBoolean()) {
+                else if (MenuMobs.instance.showOnlyPlayerModels) {
                     randMob = getRandomPlayer(world);
-                } else if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean()) {
+                } else if (MenuMobs.instance.allowDebugOutput) {
                     randMob = getNextEntity(world);
                 } else {
-                    randMob = EntityUtils.getRandomLivingEntity(world, entityBlacklist, 4, fallbackPlayerNames);
+                    Set blacklist = new HashSet(entityBlacklist);
+                    blacklist.addAll(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
+                    randMob = EntityUtils.getRandomLivingEntity(world, blacklist, 4, fallbackPlayerNames);
                 }
                 if (randMob instanceof EntityPlayer)
                     randMob.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) 127));

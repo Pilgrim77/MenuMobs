@@ -28,6 +28,14 @@ public class GuiFixedMobEntry extends GuiEditArray {
         if (entryList == null)
             entryList = new GuiEditFixedMobEntries(this, this.mc, this.configElement, this.beforeValues, this.currentValues);
 
+        ((GuiEditFixedMobEntries) entryList).controlWidth = (this.width / 2) - (configElement.isListLengthFixed() ? 0 : 48);
+        entryList.width = width;
+        entryList.height = height;
+        entryList.top = titleLine2 != null ? (titleLine3 != null ? 43 : 33) : 23;
+        entryList.bottom = height - 32;
+        entryList.right = width;
+        entryList.recalculateState();
+
         int undoGlyphWidth = mc.fontRendererObj.getStringWidth(UNDO_CHAR) * 2;
         int resetGlyphWidth = mc.fontRendererObj.getStringWidth(RESET_CHAR) * 2;
         int doneWidth = Math.max(mc.fontRendererObj.getStringWidth(I18n.format("gui.done")) + 20, 100);
@@ -39,8 +47,6 @@ public class GuiFixedMobEntry extends GuiEditArray {
                 this.height - 29, resetWidth, 20, " " + I18n.format("fml.configgui.tooltip.resetToDefault"), RESET_CHAR, 2.0F));
         this.buttonList.add(btnUndoChanges = new GuiUnicodeGlyphButton(2002, this.width / 2 - buttonWidthHalf + doneWidth + 5,
                 this.height - 29, undoWidth, 20, " " + I18n.format("fml.configgui.tooltip.undoChanges"), UNDO_CHAR, 2.0F));
-        ((GuiEditFixedMobEntries) entryList).controlWidth = (this.width / 2) - (configElement.isListLengthFixed() ? 0 : 48);
-        entryList.recalculateState();
     }
 
     /**
@@ -56,13 +62,13 @@ public class GuiFixedMobEntry extends GuiEditArray {
         this.entryList.recalculateState();
     }
 
-    public void setValueFromChildScreen(int index, Object value) {
+    void setValueFromChildScreen(int index, Object value) {
         this.entryList.listEntries.set(index, new FixedEntityArrayEntry.FixedMobArrayEntry(this, entryList, configElement, value));
     }
 
     public static class GuiEditFixedMobEntries extends GuiEditArrayEntries {
 
-        public int controlWidth;
+        int controlWidth;
 
         public GuiEditFixedMobEntries(GuiEditArray parent, Minecraft mc, IConfigElement configElement, Object[] beforeValues, Object[] currentValues) {
             super(parent, mc, configElement, beforeValues, currentValues);
@@ -127,7 +133,7 @@ public class GuiFixedMobEntry extends GuiEditArray {
 
         @Override
         protected void saveListChanges() {
-            List removeList = new ArrayList<IArrayEntry>();
+            List<IArrayEntry> removeList = new ArrayList<IArrayEntry>();
             for (IArrayEntry entry : listEntries) {
                 if (entry.getValue() == "" && entry instanceof FixedEntityArrayEntry)
                     removeList.add(entry);

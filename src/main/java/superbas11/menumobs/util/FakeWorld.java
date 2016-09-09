@@ -35,7 +35,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import superbas11.menumobs.ConfigElements;
+import superbas11.menumobs.MenuMobs;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -196,7 +196,7 @@ public class FakeWorld extends World {
 
     @Override
     public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
-        PositionedSoundRecord positionedsoundrecord = new PositionedSoundRecord(soundIn.getSoundName(), SoundCategory.MASTER, ((float) ConfigElements.MOB_SOUNDS_VOLUME.getSetting().getDouble()), pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F);
+        PositionedSoundRecord positionedsoundrecord = new PositionedSoundRecord(soundIn.getSoundName(), SoundCategory.MASTER, (float) MenuMobs.instance.mobSoundVolume, pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F);
         FMLClientHandler.instance().getClient().getSoundHandler().playSound(positionedsoundrecord);
     }
 

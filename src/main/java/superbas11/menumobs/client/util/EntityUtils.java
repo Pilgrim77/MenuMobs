@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import superbas11.menumobs.ConfigElements;
+import superbas11.menumobs.MenuMobs;
 import superbas11.menumobs.util.LogHelper;
 
 import javax.annotation.Nullable;
@@ -200,7 +200,7 @@ public class EntityUtils {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static EntityLivingBase getRandomLivingEntity(World world,
-                                                         List blacklist, int numberOfAttempts,
+                                                         Set blacklist, int numberOfAttempts,
                                                          List<SimpleEntry<UUID, String>> fallbackPlayerNames) {
         Random random = new Random();
         final NetworkPlayerInfo networkPlayerInfo;
@@ -241,7 +241,7 @@ public class EntityUtils {
                         "Chicken", world);
         }
 
-        if (ConfigElements.ALLOW_DEBUG_OUTPUT.getSetting().getBoolean())
+        if (MenuMobs.instance.allowDebugOutput)
             LogHelper.info(entStrings[id].toString());
 
         return (EntityLivingBase) EntityList.createEntityByName(

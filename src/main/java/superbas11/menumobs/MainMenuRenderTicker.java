@@ -111,6 +111,7 @@ public class MainMenuRenderTicker {
         entityBlacklist.add("graves.playerzombie");
         entityBlacklist.add("headcrumbs.Human");
         entityBlacklist.add("thuttech.thuttechlift");
+        entityBlacklist.add("evilcraft.vengeanceSpirit");
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
         // UUIDs gotten using mctools.connorlinfoot.com
@@ -490,8 +491,9 @@ public class MainMenuRenderTicker {
 
     @SubscribeEvent
     public void onGameTick(TickEvent.ClientTickEvent event) {
-        if (world != null && randMob != null && event.phase == TickEvent.Phase.START) {
+        if (world != null && randMob != null && player != null && event.phase == TickEvent.Phase.START) {
 
+            mcClient.thePlayer = player;
             world.updateEntity(randMob);
             world.updateEntity(player);
 
@@ -501,6 +503,8 @@ public class MainMenuRenderTicker {
                     ((EntityLiving) randMob).playLivingSound();
                 }
             }
+
+            mcClient.thePlayer = null;
         }
     }
 

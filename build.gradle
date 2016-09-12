@@ -42,8 +42,8 @@ configFile.withReader {
 }
 
 group = config.group_name
-version = config.mod_version
-archivesBaseName = "[${config.minecraft_version}]${config.mod_id}"
+version = "${config.minecraft_version}-${config.mod_version}"
+archivesBaseName = "${config.mod_id}"
 
 minecraft {
     version = config.minecraft_version + "-" + config.forge_version //+ "-1.10.0" // grab latest forge
@@ -79,11 +79,6 @@ jar {
     manifest {
         attributes 'FMLAT': 'MenuMobs_at.cfg'
     }
-}
-
-// change the name of my obfuscated jar
-jar {
-    appendix = config.appendix
 }
 
 dependencies {

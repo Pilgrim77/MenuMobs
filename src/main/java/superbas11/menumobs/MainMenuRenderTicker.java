@@ -206,16 +206,13 @@ public class MainMenuRenderTicker {
 
     private static EntityLivingBase getNextEntity(World world) {
         Class clazz;
-        String mobName;
-        List blacklist = Arrays.asList(MenuMobs.instance.blacklist.getStringList());
         int tries = 0;
         do {
             if (++id >= entStrings.length)
                 id = 0;
             clazz = (Class) EntityList.NAME_TO_CLASS.get((String) entStrings[id]);
-            mobName = EntityList.getEntityStringFromClass(clazz);
         }
-        while (!EntityLivingBase.class.isAssignableFrom(clazz) && !blacklist.contains(mobName) && (++tries <= 5));
+        while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
 
         //Using a player as fallback.
         if (!EntityLivingBase.class.isAssignableFrom(clazz))

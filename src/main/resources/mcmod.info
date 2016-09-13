@@ -13,8 +13,8 @@
     "logoFile": "",
     "screenshots": [],
     "parent": "",
-    "requiredMods": ["Forge"],
-    "dependencies": ["Forge"],
+    "requiredMods": ["Forge@[12.18.1.2080,)"],
+    "dependencies": ["Forge@[12.18.1.2080,)"],
     "dependants": [],
     "useDependencyInformation": "true"
   }]

@@ -22,7 +22,7 @@ public class BlacklistArrayEntry extends GuiEditArrayEntries.BaseEntry {
         btnValue.width = owningEntryList.controlWidth;
         btnValue.xPosition = listWidth / 4;
         btnValue.yPosition = y;
-        btnValue.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
+        btnValue.drawButton(owningEntryList.mc, mouseX, mouseY);
     }
 
     @Override

@@ -199,6 +199,7 @@ public class MainMenuRenderTicker {
     private World world;
     private EntityLivingBase randMob;
     private EntityPlayerSP player;
+    private Thread init;
 
     public MainMenuRenderTicker() {
         mcClient = FMLClientHandler.instance().getClient();
@@ -211,6 +212,11 @@ public class MainMenuRenderTicker {
             if (++id >= entStrings.length)
                 id = 0;
             clazz = (Class) EntityList.NAME_TO_CLASS.get((String) entStrings[id]);
+
+            if(Thread.interrupted()){
+                LogHelper.info("Interrupted!");
+                return null;
+            }
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
 
@@ -414,8 +420,13 @@ public class MainMenuRenderTicker {
 
         if (MenuMobs.instance.showMainMenuMobs && !erroredOut && isMainMenu(mcClient.currentScreen)) {
             try {
-                if ((player == null) || (player.worldObj == null) || (randMob == null))
-                    init();
+                if ((player == null) || (player.worldObj == null) || (randMob == null)) {
+                    if(init == null || (init != null && !init.isAlive())){
+                        init = new Thread(new init());
+                        init.start();
+                    }
+                    return;
+                }
 
                 //In cause of someone resetting the renderer. cough cough... schematica...
                 if (mcClient.getRenderManager().worldObj == null || mcClient.getRenderManager().renderViewEntity == null)
@@ -506,68 +517,6 @@ public class MainMenuRenderTicker {
         }
     }
 
-    private void init() {
-        try {
-            boolean createNewWorld = world == null;
-            WorldInfo worldInfo = new WorldInfo(new NBTTagCompound());
-
-            if (createNewWorld)
-                world = new FakeWorld(worldInfo);
-
-            if (createNewWorld || (player == null)) {
-                player = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
-                    @Override
-                    public NetworkPlayerInfo getPlayerInfo(UUID uniqueId) {
-                        return new NetworkPlayerInfo(mcClient.getSession().getProfile());
-                    }
-
-                    @Override
-                    public NetworkPlayerInfo getPlayerInfo(String name) {
-                        return new NetworkPlayerInfo(mcClient.getSession().getProfile());
-                    }
-                }, null);
-                int ModelParts = 0;
-                for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
-                    ModelParts |= enumplayermodelparts.getPartMask();
-                }
-                player.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
-                player.setPrimaryHand(mcClient.gameSettings.mainHand);
-                player.dimension = 0;
-                player.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
-                player.eyeHeight = 1.82F;
-                setRandomMobItem(player);
-            }
-
-            if (createNewWorld || (randMob == null)) {
-                if (MenuMobs.instance.fixedMob.length > 0)
-                    randMob = getFixedEntity(world);
-                else if (MenuMobs.instance.showOnlyPlayerModels) {
-                    randMob = getRandomPlayer(world);
-                } else if (MenuMobs.instance.allowDebugOutput) {
-                    randMob = getNextEntity(world);
-                } else {
-                    Set blacklist = new HashSet(entityBlacklist);
-                    blacklist.addAll(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
-                    randMob = EntityUtils.getRandomLivingEntity(world, blacklist, 4, fallbackPlayerNames);
-                }
-                if (randMob instanceof EntityPlayer)
-                    randMob.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) 127));
-
-                setRandomMobProperties(randMob);
-                setRandomMobItem(randMob);
-            }
-
-            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
-        } catch (Throwable e) {
-            LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
-            e.printStackTrace();
-            erroredOut = true;
-            player = null;
-            randMob = null;
-            world = null;
-        }
-    }
-
     public void register() {
         if (!isRegistered) {
             LogHelper.info("Enabling Main Menu Mob render ticker");
@@ -581,9 +530,13 @@ public class MainMenuRenderTicker {
             LogHelper.info("Disabling Main Menu Mob render ticker");
             MinecraftForge.EVENT_BUS.unregister(this);
             isRegistered = false;
-            randMob = null;
-            world = null;
-            player = null;
+            if(init != null && init.isAlive())
+                init.interrupt();
+            else{
+                randMob = null;
+                world = null;
+                player = null;
+            }
         }
     }
 
@@ -603,6 +556,81 @@ public class MainMenuRenderTicker {
                 flag = false;
             }
             return gui instanceof GuiMainMenu || flag;
+        }
+    }
+
+    private class init implements Runnable {
+        @Override
+        public void run() {
+            try {
+                boolean createNewWorld = world == null;
+                WorldInfo worldInfo = new WorldInfo(new NBTTagCompound());
+
+                if (createNewWorld)
+                    world = new FakeWorld(worldInfo);
+
+                if (createNewWorld || (player == null)) {
+                    player = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
+                        @Override
+                        public NetworkPlayerInfo getPlayerInfo(UUID uniqueId) {
+                            return new NetworkPlayerInfo(mcClient.getSession().getProfile());
+                        }
+
+                        @Override
+                        public NetworkPlayerInfo getPlayerInfo(String name) {
+                            return new NetworkPlayerInfo(mcClient.getSession().getProfile());
+                        }
+                    }, null);
+                    int ModelParts = 0;
+                    for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
+                        ModelParts |= enumplayermodelparts.getPartMask();
+                    }
+                    player.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) ModelParts));
+                    player.setPrimaryHand(mcClient.gameSettings.mainHand);
+                    player.dimension = 0;
+                    player.movementInput = new MovementInputFromOptions(mcClient.gameSettings);
+                    player.eyeHeight = 1.82F;
+                    setRandomMobItem(player);
+                }
+
+                if (createNewWorld || (randMob == null)) {
+                    if (MenuMobs.instance.fixedMob.length > 0)
+                        randMob = getFixedEntity(world);
+                    else if (MenuMobs.instance.showOnlyPlayerModels) {
+                        randMob = getRandomPlayer(world);
+                    } else if (MenuMobs.instance.allowDebugOutput) {
+                        randMob = getNextEntity(world);
+                    } else {
+                        Set blacklist = new HashSet(entityBlacklist);
+                        blacklist.addAll(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
+                        randMob = EntityUtils.getRandomLivingEntity(world, blacklist, 4, fallbackPlayerNames);
+                    }
+
+                    if (randMob instanceof EntityPlayer)
+                        randMob.getDataManager().set(EntityPlayer.PLAYER_MODEL_FLAG, Byte.valueOf((byte) 127));
+
+                    setRandomMobProperties(randMob);
+                    setRandomMobItem(randMob);
+                }
+
+                if (randMob == null)
+                {
+                    player = null;
+                    randMob = null;
+                    world = null;
+                    LogHelper.warning("Random mob is null! Is the search process interrupted?");
+                    return;
+                }
+
+                mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
+            } catch (Throwable e) {
+                LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
+                e.printStackTrace();
+                erroredOut = true;
+                player = null;
+                randMob = null;
+                world = null;
+            }
         }
     }
 }

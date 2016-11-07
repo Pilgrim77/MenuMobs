@@ -477,6 +477,7 @@ public class MainMenuRenderTicker {
                 Set<String> blacklist = new HashSet<String>(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
                 blacklist.add(EntityList.getEntityString(randMob));
                 MenuMobs.instance.blacklist.set(blacklist.toArray(new String[]{}));
+                Reference.config.save();
                 randMob = null;
             }
             //Next button

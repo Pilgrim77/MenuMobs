@@ -1,6 +1,5 @@
 package superbas11.menumobs.gui;
 
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import net.minecraftforge.fml.client.config.GuiEditArray;
 import net.minecraftforge.fml.client.config.GuiEditArrayEntries;

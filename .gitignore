@@ -7,6 +7,7 @@
 /.idea/
 /out/
 /libs/
+/mcp/
 .project
 .classpath
 build.properties.old

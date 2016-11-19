@@ -2,9 +2,6 @@ package superbas11.menumobs;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
-import com.setycz.chickens.ChickensRegistry;
-import com.setycz.chickens.ChickensRegistryItem;
-import com.setycz.chickens.chicken.EntityChickensChicken;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -53,6 +50,8 @@ import superbas11.menumobs.util.FakeWorld;
 import superbas11.menumobs.util.LogHelper;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
@@ -290,9 +289,19 @@ public class MainMenuRenderTicker {
         }
 
         //Chicken mod integration.
-        else if (Loader.isModLoaded("chickens") && ent instanceof EntityChickensChicken) {
-            List<Integer> chickens = getChickenTypes(ChickensRegistry.getItems());
-            ((EntityChickensChicken) ent).setChickenType(chickens.get(random.nextInt(chickens.size())));
+        else if (Loader.isModLoaded("chickens")) {
+            try {
+                Class EntityChickensChicken = Class.forName("com.setycz.chickens.chicken.EntityChickensChicken");
+
+                if (EntityChickensChicken.isInstance(ent)) {
+                    Method getItems = Class.forName("com.setycz.chickens.ChickensRegistry").getMethod("getItems");
+
+                    List<Integer> chickens = getChickenTypes((Collection) getItems.invoke(null));
+                    EntityChickensChicken.getMethod("setChickenType", int.class).invoke(ent, chickens.get(random.nextInt(chickens.size())));
+                }
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -371,10 +380,11 @@ public class MainMenuRenderTicker {
     }
 
     @Optional.Method(modid = "chickens")
-    private static List<Integer> getChickenTypes(Collection<ChickensRegistryItem> chickens) {
+    private static List<Integer> getChickenTypes(Collection chickens) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         List<Integer> result = new ArrayList<Integer>();
-        for (ChickensRegistryItem chicken : chickens) {
-            result.add(chicken.getId());
+        Class ChickensRegistryItem = Class.forName("com.setycz.chickens.ChickensRegistryItem");
+        for (Object chicken : chickens) {
+            result.add((Integer) ChickensRegistryItem.getMethod("getId").invoke(chicken));
         }
         return result;
     }
@@ -383,9 +393,11 @@ public class MainMenuRenderTicker {
         mcClient.getTextureManager().bindTexture(new ResourceLocation("fml:textures/gui/icons.png"));
         GlStateManager.disableDepth();
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
-        if (mouseX < 8 && mouseY < 8)
+        if (mouseX < 8 && mouseY < 8) {
             GuiUtils.drawHoveringText(Collections.singletonList("Add mob to the blacklist"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
-        GlStateManager.disableLighting();
+            GlStateManager.disableLighting();
+            GlStateManager.resetColor();
+        }
     }
 
     private void drawNextButton(int mouseX, int mouseY) {
@@ -400,6 +412,7 @@ public class MainMenuRenderTicker {
             Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 14, 6, 9, 96, 96);
             GuiUtils.drawHoveringText(Collections.singletonList("Next mob"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
             GlStateManager.disableLighting();
+            GlStateManager.resetColor();
         } else
             Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 2, 6, 9, 96, 96);
     }

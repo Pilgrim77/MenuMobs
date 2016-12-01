@@ -570,6 +570,7 @@ public class MainMenuRenderTicker {
                 setRandomMobItem(randMob);
             }
 
+            EntityUtils.updateLightmap(mcClient, world);
             mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
         } catch (Throwable e) {
             LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");

@@ -1,21 +1,29 @@
 {
   "modListVersion": 2,
-  "modList": [{
-    "modid": "menumobs",
-    "name": "Menu Mobs",
-    "description": "Gimmick mod for Minecraft that renders the current player and a random mob on the in-game menus. Credits: bspkrs.",
-    "version": "${mod_version}",
-    "mcversion": "${minecraft_version}",
-    "url": "",
-    "updateUrl": "",
-    "authorList": [ "superbas11" ],
-    "credits": "Original code came from bspkrsCore made by bspkrs for Minecraft 1.7.10",
-    "logoFile": "",
-    "screenshots": [],
-    "parent": "",
-    "requiredMods": ["Forge@[12.18.1.2080,)"],
-    "dependencies": ["Forge@[12.18.1.2080,)"],
-    "dependants": [],
-    "useDependencyInformation": "true"
-  }]
+  "modList": [
+    {
+      "modid": "menumobs",
+      "name": "Menu Mobs",
+      "description": "Gimmick mod for Minecraft that renders the current player and a random mob on the in-game menus. Credits: bspkrs.",
+      "version": "${mod_version}",
+      "mcversion": "${minecraft_version}",
+      "url": "",
+      "updateUrl": "",
+      "authorList": [
+        "superbas11"
+      ],
+      "credits": "Original code came from bspkrsCore made by bspkrs for Minecraft 1.7.10",
+      "logoFile": "",
+      "screenshots": [],
+      "parent": "",
+      "requiredMods": [
+        "Forge@[12.18.1.2080,)"
+      ],
+      "dependencies": [
+        "Forge@[12.18.1.2080,)"
+      ],
+      "dependants": [],
+      "useDependencyInformation": "true"
+    }
+  ]
 }

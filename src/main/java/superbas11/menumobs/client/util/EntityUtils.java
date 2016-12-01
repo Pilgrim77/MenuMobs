@@ -15,6 +15,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import superbas11.menumobs.MenuMobs;
 import superbas11.menumobs.util.LogHelper;
 
@@ -246,5 +248,85 @@ public class EntityUtils {
 
         return (EntityLivingBase) EntityList.createEntityByName(
                 (String) entStrings[id], world);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void updateLightmap(Minecraft mc, World world) {
+        float f = world.getSunBrightness(1.0F);
+        float f1 = f * 0.95F + 0.05F;
+
+        for (int i = 0; i < 256; ++i) {
+            float f2 = world.provider.getLightBrightnessTable()[i / 16] * f1;
+            float f3 = world.provider.getLightBrightnessTable()[i % 16] * (mc.entityRenderer.torchFlickerX * 0.1F + 1.5F);
+
+            float f4 = f2 * (f * 0.65F + 0.35F);
+            float f5 = f2 * (f * 0.65F + 0.35F);
+            float f6 = f3 * ((f3 * 0.6F + 0.4F) * 0.6F + 0.4F);
+            float f7 = f3 * (f3 * f3 * 0.6F + 0.4F);
+            float f8 = f4 + f3;
+            float f9 = f5 + f6;
+            float f10 = f2 + f7;
+            f8 = f8 * 0.96F + 0.03F;
+            f9 = f9 * 0.96F + 0.03F;
+            f10 = f10 * 0.96F + 0.03F;
+
+            if (f8 > 1.0F) {
+                f8 = 1.0F;
+            }
+
+            if (f9 > 1.0F) {
+                f9 = 1.0F;
+            }
+
+            if (f10 > 1.0F) {
+                f10 = 1.0F;
+            }
+
+            float f16 = mc.gameSettings.gammaSetting;
+            float f17 = 1.0F - f8;
+            float f13 = 1.0F - f9;
+            float f14 = 1.0F - f10;
+            f17 = 1.0F - f17 * f17 * f17 * f17;
+            f13 = 1.0F - f13 * f13 * f13 * f13;
+            f14 = 1.0F - f14 * f14 * f14 * f14;
+            f8 = f8 * (1.0F - f16) + f17 * f16;
+            f9 = f9 * (1.0F - f16) + f13 * f16;
+            f10 = f10 * (1.0F - f16) + f14 * f16;
+            f8 = f8 * 0.96F + 0.03F;
+            f9 = f9 * 0.96F + 0.03F;
+            f10 = f10 * 0.96F + 0.03F;
+
+            if (f8 > 1.0F) {
+                f8 = 1.0F;
+            }
+
+            if (f9 > 1.0F) {
+                f9 = 1.0F;
+            }
+
+            if (f10 > 1.0F) {
+                f10 = 1.0F;
+            }
+
+            if (f8 < 0.0F) {
+                f8 = 0.0F;
+            }
+
+            if (f9 < 0.0F) {
+                f9 = 0.0F;
+            }
+
+            if (f10 < 0.0F) {
+                f10 = 0.0F;
+            }
+
+            int j = 255;
+            int k = (int) (f8 * 255.0F);
+            int l = (int) (f9 * 255.0F);
+            int i1 = (int) (f10 * 255.0F);
+            mc.entityRenderer.lightmapColors[i] = -16777216 | k << 16 | l << 8 | i1;
+        }
+
+        mc.entityRenderer.lightmapTexture.updateDynamicTexture();
     }
 }

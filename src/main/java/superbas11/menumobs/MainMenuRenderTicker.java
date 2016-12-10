@@ -610,13 +610,17 @@ public class MainMenuRenderTicker {
 
         if (gui == null)
             return false;
-        else {
+        else if (gui instanceof GuiMainMenu)
+            return true;
+        else if (Loader.isModLoaded("CustomMainMenu")) {
             try {
                 flag = gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
             } catch (Exception e) {
                 flag = false;
             }
-            return gui instanceof GuiMainMenu || flag;
+            return flag;
         }
+
+        return false;
     }
 }

@@ -14,3 +14,5 @@ build.properties.old
 *.iml
 *.iws
 *.ipr
+/classes/
+src/main/java/net/

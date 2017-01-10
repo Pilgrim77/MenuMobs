@@ -45,6 +45,9 @@ group = config.group_name
 version = "${config.minecraft_version}-${config.mod_version}"
 archivesBaseName = "${config.mod_id}"
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 minecraft {
     version = config.minecraft_version + "-" + config.forge_version //+ "-1.10.0" // grab latest forge
     mappings = config.mappings_version

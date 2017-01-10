@@ -190,6 +190,28 @@ public class FakeWorld extends World {
     }
 
     @Override
+    public float getLightBrightness(BlockPos pos) {
+        return 1f;
+    }
+
+    @Override
+    public float getSunBrightnessFactor(float p_72967_1_) {
+        return 1f;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public float getSunBrightness(float p_72971_1_) {
+        return 1f;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public float getSunBrightnessBody(float p_72971_1_) {
+        return 1f;
+    }
+
+    @Override
     public boolean isDaytime() {
         return true;
     }
@@ -619,10 +641,6 @@ public class FakeWorld extends World {
         @Override
         public DimensionType getDimensionType() {
             return DimensionType.OVERWORLD;
-        }
-
-        @Override
-        protected void generateLightBrightnessTable() {
         }
 
         @Override

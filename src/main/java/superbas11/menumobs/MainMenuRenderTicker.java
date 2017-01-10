@@ -570,6 +570,7 @@ public class MainMenuRenderTicker {
                 setRandomMobItem(randMob);
             }
 
+            EntityUtils.updateLightmap(mcClient, world);
             mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
         } catch (Throwable e) {
             LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
@@ -609,13 +610,17 @@ public class MainMenuRenderTicker {
 
         if (gui == null)
             return false;
-        else {
+        else if (gui instanceof GuiMainMenu)
+            return true;
+        else if (Loader.isModLoaded("CustomMainMenu")) {
             try {
                 flag = gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
             } catch (Exception e) {
                 flag = false;
             }
-            return gui instanceof GuiMainMenu || flag;
+            return flag;
         }
+
+        return false;
     }
 }

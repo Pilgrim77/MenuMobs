@@ -22,7 +22,7 @@ import java.util.List;
 
 import static net.minecraftforge.common.config.Property.Type.STRING;
 
-@Mod(modid = Reference.MODID, name = Reference.NAME, version = "@MOD_VERSION@", useMetadata = true, clientSideOnly = true, guiFactory = Reference.GUI_FACTORY)
+@Mod(modid = Reference.MODID, name = Reference.NAME, version = "@MOD_VERSION@", useMetadata = true, clientSideOnly = true, acceptableRemoteVersions = "*", guiFactory = Reference.GUI_FACTORY)
 public class MenuMobs {
     @Instance(value = Reference.MODID)
     public static MenuMobs instance;

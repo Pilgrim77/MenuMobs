@@ -3,6 +3,7 @@ package superbas11.menumobs.util;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.Entity;
@@ -47,14 +48,15 @@ import java.util.List;
  *
  * @author superbas11
  */
+@SideOnly(Side.CLIENT)
 public class FakeWorld extends World {
     public FakeWorld(WorldInfo worldInfo) {
         super(new FakeSaveHandler(), worldInfo, new FakeWorldProvider(), new Profiler(), true);
-        this.provider.registerWorld(this);
+        this.provider.setWorld(this);
     }
 
     @Override
-    public Biome getBiomeGenForCoords(BlockPos pos) {
+    public Biome getBiome(BlockPos pos) {
         return new BiomePlains(false, (new Biome.BiomeProperties("Plains")).setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F));
     }
 
@@ -109,7 +111,8 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public void notifyNeighborsOfStateChange(BlockPos pos, Block blockType) {
+    public void notifyNeighborsOfStateChange(BlockPos pos, Block blockType, boolean p_175685_3_) {
+        super.notifyNeighborsOfStateChange(pos, blockType, p_175685_3_);
     }
 
     @Override
@@ -117,7 +120,7 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public void notifyBlockOfStateChange(BlockPos pos, Block blockIn) {
+    public void notifyNeighborsRespectDebug(BlockPos pos, Block blockType, boolean p_175722_3_) {
     }
 
     @Override
@@ -255,7 +258,7 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public boolean spawnEntityInWorld(Entity par1Entity) {
+    public boolean spawnEntity(Entity par1Entity) {
         return false;
     }
 
@@ -321,11 +324,6 @@ public class FakeWorld extends World {
 
     @Override
     public boolean isMaterialInBB(AxisAlignedBB par1AxisAlignedBB, Material par2Material) {
-        return false;
-    }
-
-    @Override
-    public boolean isAABBInMaterial(AxisAlignedBB par1AxisAlignedBB, Material par2Material) {
         return false;
     }
 
@@ -567,7 +565,7 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public void setItemData(String par1Str, WorldSavedData par2WorldSavedData) {
+    public void setData(String dataID, WorldSavedData worldSavedDataIn) {
     }
 
     @Override
@@ -793,7 +791,7 @@ public class FakeWorld extends World {
     protected static class FakeSaveHandler implements ISaveHandler {
         @Override
         public TemplateManager getStructureTemplateManager() {
-            return new TemplateManager("");
+            return new TemplateManager("", Minecraft.getMinecraft().getDataFixer());
         }
 
         @Override
@@ -850,13 +848,19 @@ public class FakeWorld extends World {
         }
 
         @Override
-        public boolean unloadQueuedChunks() {
+        public String makeString() {
+            return null;
+        }
+
+        @Override
+        public boolean tick() {
+            //TODO check if it still does not matter what this returns.
             return false;
         }
 
         @Override
-        public String makeString() {
-            return null;
+        public boolean isChunkGeneratedAt(int p_191062_1_, int p_191062_2_) {
+            return true;
         }
     }
 }

@@ -4,12 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import net.minecraftforge.fml.client.config.GuiEditArray;
 import net.minecraftforge.fml.client.config.GuiEditArrayEntries;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import org.lwjgl.input.Keyboard;
 import superbas11.menumobs.MainMenuRenderTicker;
+import superbas11.menumobs.util.LogHelper;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -86,12 +88,14 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         protected static Map<Object, String> getSelectableValues() {
             Map<Object, String> selectableValues = new TreeMap<Object, String>();
             Class clazz;
-            String[] mobName;
             for (String mobID : MainMenuRenderTicker.getEntStrings()) {
-                clazz = (Class) EntityList.NAME_TO_CLASS.get(mobID);
-                mobName = mobID.split("\\.");
+                clazz = (Class) EntityList.getClass(new ResourceLocation(mobID));
+                if (clazz == null) {
+                    LogHelper.severe("Cannot find class of entity %s", mobID);
+                    continue;
+                }
                 if (EntityLivingBase.class.isAssignableFrom(clazz))
-                    selectableValues.put(mobID, mobName[mobName.length - 1]);
+                    selectableValues.put(mobID, EntityList.getTranslationName(new ResourceLocation(mobID)));
             }
             return selectableValues;
         }

@@ -11,10 +11,14 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import superbas11.menumobs.MenuMobs;
@@ -23,7 +27,11 @@ import superbas11.menumobs.util.LogHelper;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class EntityUtils {
     // @formatter:off
@@ -72,6 +80,7 @@ public class EntityUtils {
      * you're asking)
      */
     // @formatter:on
+    @SideOnly(Side.CLIENT)
     public static float getModelSize(EntityLivingBase ent) {
         Render render = Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(ent);
         if (render instanceof RenderLivingBase) {
@@ -142,6 +151,7 @@ public class EntityUtils {
     //        }
     //    }
 
+    @SideOnly(Side.CLIENT)
     public static void drawEntityOnScreen(int posX, int posY, float scale, float mouseX, float mouseY, EntityLivingBase ent) {
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
@@ -196,11 +206,13 @@ public class EntityUtils {
         return (targetHeight / Math.max(ent.width, ent.height)) * baseScale;
     }
 
+    @SideOnly(Side.CLIENT)
     public static EntityLivingBase getRandomLivingEntity(World world) {
         return getRandomLivingEntity(world, null, 5, null);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
+    @SideOnly(Side.CLIENT)
     public static EntityLivingBase getRandomLivingEntity(World world,
                                                          Set blacklist, int numberOfAttempts,
                                                          List<SimpleEntry<UUID, String>> fallbackPlayerNames) {
@@ -209,19 +221,21 @@ public class EntityUtils {
         GameProfile gameProfile;
         Minecraft mcClient = Minecraft.getMinecraft();
         // Get a COPY dumbass!
-        Set entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
+        Set<String> entities = ForgeRegistries.ENTITIES.getKeys().stream().map(ResourceLocation::getResourcePath).collect(Collectors.toSet());
 
-        if (blacklist != null)
-            entities.removeAll(blacklist);
+        if (blacklist != null) {
+            if (!entities.removeAll(blacklist))
+                LogHelper.severe("Nothing got removed!");
+        }
 
-        Object[] entStrings = entities.toArray(new Object[]{});
+        String[] entStrings = entities.toArray(new String[]{});
         int id;
         Class clazz;
 
         int tries = 0;
         do {
             id = random.nextInt(entStrings.length);
-            clazz = (Class) EntityList.NAME_TO_CLASS.get(entStrings[id]);
+            clazz = (Class) EntityList.getClass(new ResourceLocation(entStrings[id]));
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz)
                 && (++tries <= numberOfAttempts));
@@ -239,15 +253,15 @@ public class EntityUtils {
                     }
                 };
             } else
-                return (EntityLivingBase) EntityList.createEntityByName(
-                        "Chicken", world);
+                return (EntityLivingBase) EntityList.createEntityByIDFromName(
+                        new ResourceLocation("Chicken"), world);
         }
 
         if (MenuMobs.instance.allowDebugOutput)
             LogHelper.info(entStrings[id].toString());
 
-        return (EntityLivingBase) EntityList.createEntityByName(
-                (String) entStrings[id], world);
+        return (EntityLivingBase) EntityList.createEntityByIDFromName(
+                new ResourceLocation(entStrings[id]), world);
     }
 
     @SideOnly(Side.CLIENT)
@@ -328,5 +342,13 @@ public class EntityUtils {
         }
 
         mc.entityRenderer.lightmapTexture.updateDynamicTexture();
+    }
+
+    public static Class<? extends Entity> getEntityClassByName(String name) {
+        for (EntityEntry e : ForgeRegistries.ENTITIES) {
+            if (e.getName().equals(name))
+                return e.getEntityClass();
+        }
+        return null;
     }
 }

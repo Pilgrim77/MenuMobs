@@ -15,7 +15,10 @@ import net.minecraftforge.fml.client.config.IConfigElement;
 import org.lwjgl.input.Mouse;
 import superbas11.menumobs.client.util.MobComparator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GuiSelectFixedMob extends GuiSelectString {
     public GuiSelectFixedMob(GuiScreen parentScreen, IConfigElement configElement, int slotIndex, Map<Object, String> selectableValues, Object currentValue, boolean enabled) {
@@ -56,17 +59,17 @@ public class GuiSelectFixedMob extends GuiSelectString {
             listEntries = new ArrayList<IGuiSelectStringListEntry>();
 
             int index = 0;
-            String lastCategory = "Minecraft";
+            String lastCategory = "minecraft";
             List<Map.Entry<Object, String>> sortedList = new ArrayList<Map.Entry<Object, String>>(selectableValues.entrySet());
-            Collections.sort(sortedList, new MobComparator());
+            sortedList.sort(new MobComparator());
 
             for (Map.Entry<Object, String> entry : sortedList) {
                 listEntries.add(new ListEntry(this, entry));
                 KeyList.add(entry.getKey().toString());
 
                 String slotValue = entry.getKey().toString();
-                if (slotValue.contains(".") && !slotValue.contains(lastCategory)) {
-                    lastCategory = slotValue.split("\\.")[0];
+                if (!slotValue.contains("minecraft:") && !slotValue.contains(lastCategory)) {
+                    lastCategory = slotValue.split(":")[0];
                     categories.put(lastCategory,
                             new Integer[]{
                                     index * this.slotHeight + this.headerPadding + categories.size() * 18 - 4,
@@ -95,14 +98,14 @@ public class GuiSelectFixedMob extends GuiSelectString {
         protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn) {
             int i = this.getSize();
             int categoryCount = 0;
-            String lastCategory = "Minecraft";
+            String lastCategory = "minecraft";
             Tessellator tessellator = Tessellator.getInstance();
             VertexBuffer vertexbuffer = tessellator.getBuffer();
 
             for (int j = 0; j < i; ++j) {
                 String slotValue = KeyList.get(j);
-                if (slotValue.contains(".") && !slotValue.contains(lastCategory)) {
-                    lastCategory = slotValue.split("\\.")[0];
+                if (!slotValue.contains("minecraft:") && !slotValue.contains(lastCategory)) {
+                    lastCategory = slotValue.split(":")[0];
                     drawCenteredString(fontRendererObj, lastCategory, width / 2, insideTop + j * this.slotHeight + this.headerPadding + categoryCount * 18 + 4, 16777215);
                     categoryCount++;
                 }
@@ -209,7 +212,7 @@ public class GuiSelectFixedMob extends GuiSelectString {
                                 }
 
                                 int l1 = (int) ((float) ((this.bottom - this.top) * (this.bottom - this.top)) / (float) this.getContentHeight());
-                                l1 = MathHelper.clamp_int(l1, 32, this.bottom - this.top - 8);
+                                l1 = MathHelper.clamp(l1, 32, this.bottom - this.top - 8);
                                 this.scrollMultiplier /= (float) (this.bottom - this.top - l1) / (float) k1;
                             } else {
                                 this.scrollMultiplier = 1.0F;

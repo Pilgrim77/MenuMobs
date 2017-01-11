@@ -54,6 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @SideOnly(Side.CLIENT)
@@ -73,14 +74,16 @@ public class MainMenuRenderTicker {
 
     static {
         entityBlacklist = new HashSet<String>();
-        entityBlacklist.add("Mob");
-        entityBlacklist.add("Monster");
-        entityBlacklist.add("EnderDragon");
-        entityBlacklist.add("Squid");
-        entityBlacklist.add("Ghast");
-        entityBlacklist.add("Bat");
-        entityBlacklist.add("CaveSpider");
-        entityBlacklist.add("Giant");
+        entityBlacklist.add("minecraft:lightning_bolt");
+        entityBlacklist.add("minecraft:ender_dragon");
+        entityBlacklist.add("minecraft:squid");
+        entityBlacklist.add("minecraft:ghast");
+        entityBlacklist.add("minecraft:bat");
+        entityBlacklist.add("minecraft:cave_spider");
+        entityBlacklist.add("minecraft:giant");
+        entityBlacklist.add("minecraft:elder_guardian");
+        entityBlacklist.add("minecraft:guardian");
+
         // Millenaire entities
         entityBlacklist.add("MillBlaze");
         entityBlacklist.add("MillGhast");
@@ -89,28 +92,28 @@ public class MainMenuRenderTicker {
         entityBlacklist.add("ml_GenericSimmFemale");
         entityBlacklist.add("ml_GenericVillager");
 
-        entityBlacklist.add("BiomesOPlenty.Phantom");
-        entityBlacklist.add("forestry.butterflyGE");
-        entityBlacklist.add("TConstruct.Crystal");
-        entityBlacklist.add("Thaumcraft.Firebat");
-        entityBlacklist.add("Thaumcraft.TaintSpore");
-        entityBlacklist.add("Thaumcraft.TaintSwarm");
-        entityBlacklist.add("Thaumcraft.Taintacle");
-        entityBlacklist.add("Thaumcraft.TaintacleTiny");
-        entityBlacklist.add("Thaumcraft.Wisp");
-        entityBlacklist.add("TwilightForest.Boggard");
-        entityBlacklist.add("TwilightForest.Firefly");
-        entityBlacklist.add("TwilightForest.Helmet Crab");
-        entityBlacklist.add("TwilightForest.Hydra");
-        entityBlacklist.add("TwilightForest.HydraHead");
-        entityBlacklist.add("TwilightForest.Lower Goblin Knight");
-        entityBlacklist.add("TwilightForest.Mist Wolf");
-        entityBlacklist.add("TwilightForest.Mosquito Swarm");
-        entityBlacklist.add("TwilightForest.Upper Goblin Knight");
-        entityBlacklist.add("graves.playerzombie");
-        entityBlacklist.add("headcrumbs.Human");
-        entityBlacklist.add("thuttech.thuttechlift");
-        entityBlacklist.add("evilcraft.vengeanceSpirit");
+        entityBlacklist.add(("biomesoplenty:phantom"));
+        entityBlacklist.add(("forestry:butterflyGE"));
+        entityBlacklist.add(("tConstruct:Crystal"));
+        entityBlacklist.add(("thaumcraft:Firebat"));
+        entityBlacklist.add(("thaumcraft:TaintSpore"));
+        entityBlacklist.add(("thaumcraft:TaintSwarm"));
+        entityBlacklist.add(("thaumcraft:Taintacle"));
+        entityBlacklist.add(("thaumcraft:TaintacleTiny"));
+        entityBlacklist.add(("thaumcraft:Wisp"));
+        entityBlacklist.add(("twilightForest:Boggard"));
+        entityBlacklist.add(("twilightForest:Firefly"));
+        entityBlacklist.add(("twilightForest:Helmet Crab"));
+        entityBlacklist.add(("twilightForest:Hydra"));
+        entityBlacklist.add(("twilightForest:HydraHead"));
+        entityBlacklist.add(("twilightForest:Lower Goblin Knight"));
+        entityBlacklist.add(("twilightForest:Mist Wolf"));
+        entityBlacklist.add(("twilightforest:Mosquito Swarm"));
+        entityBlacklist.add(("twilightForest:Upper Goblin Knight"));
+        entityBlacklist.add(("graves:playerzombie"));
+        entityBlacklist.add(("headcrumbs:Human"));
+        entityBlacklist.add(("thuttech:thuttechlift"));
+        entityBlacklist.add(("evilcraft:vengeanceSpirit"));
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
         // UUIDs gotten using mctools.connorlinfoot.com
@@ -189,9 +192,10 @@ public class MainMenuRenderTicker {
         };
 
         // Get a COPY dumbass!
-        Set entities = new TreeSet(EntityList.NAME_TO_CLASS.keySet());
-        entities.removeAll(entityBlacklist);
-        entStrings = (String[]) entities.toArray(new String[]{});
+        Set<String> entities = EntityList.getEntityNameList().stream().map(ResourceLocation::toString).collect(Collectors.toSet());
+        if (!entities.removeAll(entityBlacklist))
+            LogHelper.severe("Nothing got removed!");
+        entStrings = entities.toArray(new String[]{});
         id = -1;
     }
 
@@ -209,7 +213,7 @@ public class MainMenuRenderTicker {
         do {
             if (++id >= entStrings.length)
                 id = 0;
-            clazz = (Class) EntityList.NAME_TO_CLASS.get((String) entStrings[id]);
+            clazz = EntityList.getClass(new ResourceLocation(entStrings[id]));
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz) && (++tries <= 5));
 
@@ -220,7 +224,7 @@ public class MainMenuRenderTicker {
         if (MenuMobs.instance.allowDebugOutput)
             LogHelper.info(entStrings[id]);
 
-        return (EntityLivingBase) EntityList.createEntityByName(entStrings[id], world);
+        return (EntityLivingBase) EntityList.createEntityByIDFromName(new ResourceLocation(entStrings[id]), world);
     }
 
     private static EntityLivingBase getFixedEntity(World world) {
@@ -233,7 +237,7 @@ public class MainMenuRenderTicker {
 
         do {
             id = random.nextInt(entityList.length);
-            clazz = (Class) EntityList.NAME_TO_CLASS.get(entityList[id]);
+            clazz = (Class) EntityList.getClass(new ResourceLocation(entityList[id]));
             if (clazz == null) {
                 try {
                     UUID UUID = UUIDFetcher.getUUIDOf(entityList[id]);
@@ -256,7 +260,7 @@ public class MainMenuRenderTicker {
                     e.printStackTrace();
                 }
             } else {
-                entity = (EntityLivingBase) EntityList.createEntityByName(entityList[id], world);
+                entity = (EntityLivingBase) EntityList.createEntityByIDFromName(new ResourceLocation(entityList[id]), world);
             }
         } while (entity == null && ++tries < entityList.length);
 
@@ -317,42 +321,27 @@ public class MainMenuRenderTicker {
             else if (ent instanceof EntityZombie)
                 ent.setHeldItem(EnumHand.MAIN_HAND, zombieItems[random.nextInt(zombieItems.length)]);
 
+            else if (ent instanceof AbstractChestHorse)
+                ((AbstractChestHorse) ent).setChested(random.nextBoolean());
+
+            else if (ent instanceof EntitySkeleton || ent instanceof EntityStray)
+                ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
+
+            else if (ent instanceof EntityWitherSkeleton)
+                ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
+
             else if (ent instanceof EntityEnderman) {
                 Object[] blocks = EntityEnderman.CARRIABLE_BLOCKS.toArray();
                 IBlockState block = ((Block) blocks[random.nextInt(blocks.length)]).getDefaultState();
                 ((EntityEnderman) ent).setHeldBlockState(block);
             } else if (ent instanceof EntityHorse) {
-                ((EntityHorse) ent).setType(HorseType.getArmorType(random.nextInt(5)));
+                int baseColor = random.nextInt(7);
+                int markings = random.nextInt(5);
+                ((EntityHorse) ent).setHorseVariant(baseColor | markings << 8);
 
-                switch (((EntityHorse) ent).getType()) {
-                    case HORSE:
-                        int baseColor = random.nextInt(7);
-                        int markings = random.nextInt(5);
-                        ((EntityHorse) ent).setHorseVariant(baseColor | markings << 8);
-
-                        if (random.nextBoolean()) {
-                            ((EntityHorse) ent).setHorseSaddled(true);
-                            ((EntityHorse) ent).setHorseArmorStack(horseArmors[random.nextInt(horseArmors.length)]);
-                        }
-                        break;
-                    case DONKEY:
-                    case MULE:
-                        ((EntityHorse) ent).setChested(random.nextBoolean());
-                }
-            } else if (ent instanceof EntitySkeleton) {
-                switch (random.nextInt(3)) {
-                    case 0:
-                        ((EntitySkeleton) ent).func_189768_a(SkeletonType.WITHER);
-                        ent.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-                        break;
-                    case 1:
-                        ((EntitySkeleton) ent).func_189768_a(SkeletonType.STRAY);
-                        ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
-                        break;
-                    case 2:
-                        ((EntitySkeleton) ent).func_189768_a(SkeletonType.NORMAL);
-                        ent.setHeldItem(EnumHand.MAIN_HAND, skelItems[random.nextInt(skelItems.length)]);
-                        break;
+                if (random.nextBoolean()) {
+                    ((EntityHorse) ent).setHorseSaddled(true);
+                    ((EntityHorse) ent).setHorseArmorStack(horseArmors[random.nextInt(horseArmors.length)]);
                 }
             }
         } catch (Throwable e) {
@@ -427,15 +416,15 @@ public class MainMenuRenderTicker {
 
         if (MenuMobs.instance.showMainMenuMobs && !erroredOut && isMainMenu(mcClient.currentScreen)) {
             try {
-                if ((player == null) || (player.worldObj == null) || (randMob == null))
+                if ((player == null) || (player.world == null) || (randMob == null))
                     init();
 
                 //In cause of someone resetting the renderer. cough cough... schematica...
-                if (mcClient.getRenderManager().worldObj == null || mcClient.getRenderManager().renderViewEntity == null)
+                if (mcClient.getRenderManager().world == null || mcClient.getRenderManager().renderViewEntity == null)
                     mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
 
                 if ((world != null) && (player != null) && (randMob != null)) {
-                    mcClient.thePlayer = player;
+                    mcClient.player = player;
                     ScaledResolution sr = new ScaledResolution(mcClient);
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
@@ -473,7 +462,7 @@ public class MainMenuRenderTicker {
                 randMob = null;
                 world = null;
             }
-            mcClient.thePlayer = null;
+            mcClient.player = null;
         }
     }
 
@@ -504,7 +493,7 @@ public class MainMenuRenderTicker {
     public void onGameTick(TickEvent.ClientTickEvent event) {
         if (world != null && randMob != null && player != null && event.phase == TickEvent.Phase.START) {
 
-            mcClient.thePlayer = player;
+            mcClient.player = player;
             world.updateEntity(randMob);
             world.updateEntity(player);
 
@@ -515,7 +504,7 @@ public class MainMenuRenderTicker {
                 }
             }
 
-            mcClient.thePlayer = null;
+            mcClient.player = null;
         }
     }
 

@@ -1,0 +1,6 @@
+{
+  "package": "superbas11.menumobs.ASM.mixin",
+  "mixins": ["Test"],
+  "client": [],
+  "server": []
+}

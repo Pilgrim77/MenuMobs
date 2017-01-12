@@ -43,6 +43,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
+import superbas11.menumobs.ASM.Interface;
 import superbas11.menumobs.client.util.EntityUtils;
 import superbas11.menumobs.client.util.UUIDFetcher;
 import superbas11.menumobs.util.FakeNetworkManager;
@@ -334,10 +335,13 @@ public class MainMenuRenderTicker {
                 Object[] blocks = EntityEnderman.CARRIABLE_BLOCKS.toArray();
                 IBlockState block = ((Block) blocks[random.nextInt(blocks.length)]).getDefaultState();
                 ((EntityEnderman) ent).setHeldBlockState(block);
-            } else if (ent instanceof EntityHorse) {
-                int baseColor = random.nextInt(7);
-                int markings = random.nextInt(5);
-                ((EntityHorse) ent).setHorseVariant(baseColor | markings << 8);
+            }
+
+            else if (ent instanceof EntityHorse) {
+                ((Interface) ent).ChangeMe();
+//                int baseColor = random.nextInt(7);
+//                int markings = random.nextInt(5);
+//                ((EntityHorse) ent).setHorseVariant(baseColor | markings << 8);
 
                 if (random.nextBoolean()) {
                     ((EntityHorse) ent).setHorseSaddled(true);

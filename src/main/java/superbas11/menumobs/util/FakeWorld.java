@@ -627,11 +627,6 @@ public class FakeWorld extends World {
     }
 
     @Override
-    public Entity getEntityByID(int i) {
-        return EntityList.createEntityByID(i, this);
-    }
-
-    @Override
     public Chunk getChunkFromChunkCoords(int par1, int par2) {
         return null;
     }

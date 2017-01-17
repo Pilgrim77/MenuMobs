@@ -7,8 +7,7 @@
       "description": "Gimmick mod for Minecraft that renders the current player and a random mob on the in-game menus. Credits: bspkrs.",
       "version": "${mod_version}",
       "mcversion": "${minecraft_version}",
-      "url": "",
-      "updateUrl": "",
+      "url": "https://minecraft.curseforge.com/projects/menumobs",
       "authorList": [
         "superbas11"
       ],

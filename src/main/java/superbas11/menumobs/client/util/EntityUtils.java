@@ -221,7 +221,7 @@ public class EntityUtils {
         GameProfile gameProfile;
         Minecraft mcClient = Minecraft.getMinecraft();
         // Get a COPY dumbass!
-        Set<String> entities = ForgeRegistries.ENTITIES.getKeys().stream().map(ResourceLocation::getResourcePath).collect(Collectors.toSet());
+        Set<String> entities = ForgeRegistries.ENTITIES.getKeys().stream().map(ResourceLocation::toString).collect(Collectors.toSet());
 
         if (blacklist != null) {
             if (!entities.removeAll(blacklist))
@@ -258,7 +258,7 @@ public class EntityUtils {
         }
 
         if (MenuMobs.instance.allowDebugOutput)
-            LogHelper.info(entStrings[id].toString());
+            LogHelper.info(entStrings[id]);
 
         return (EntityLivingBase) EntityList.createEntityByIDFromName(
                 new ResourceLocation(entStrings[id]), world);

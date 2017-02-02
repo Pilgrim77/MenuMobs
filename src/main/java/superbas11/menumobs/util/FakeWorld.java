@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -630,6 +629,11 @@ public class FakeWorld extends World {
     }
 
     protected static class FakeWorldProvider extends WorldProvider {
+
+        @Override
+        protected void init() {
+            this.hasSkyLight = true;
+        }
 
         @Override
         public DimensionType getDimensionType() {

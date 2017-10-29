@@ -36,11 +36,11 @@ public class GuiFixedMobEntry extends GuiEditArray {
         entryList.right = width;
         entryList.recalculateState();
 
-        int undoGlyphWidth = mc.fontRendererObj.getStringWidth(UNDO_CHAR) * 2;
-        int resetGlyphWidth = mc.fontRendererObj.getStringWidth(RESET_CHAR) * 2;
-        int doneWidth = Math.max(mc.fontRendererObj.getStringWidth(I18n.format("gui.done")) + 20, 100);
-        int undoWidth = mc.fontRendererObj.getStringWidth(" " + I18n.format("fml.configgui.tooltip.undoChanges")) + undoGlyphWidth + 20;
-        int resetWidth = mc.fontRendererObj.getStringWidth(" " + I18n.format("fml.configgui.tooltip.resetToDefault")) + resetGlyphWidth + 20;
+        int undoGlyphWidth = mc.fontRenderer.getStringWidth(UNDO_CHAR) * 2;
+        int resetGlyphWidth = mc.fontRenderer.getStringWidth(RESET_CHAR) * 2;
+        int doneWidth = Math.max(mc.fontRenderer.getStringWidth(I18n.format("gui.done")) + 20, 100);
+        int undoWidth = mc.fontRenderer.getStringWidth(" " + I18n.format("fml.configgui.tooltip.undoChanges")) + undoGlyphWidth + 20;
+        int resetWidth = mc.fontRenderer.getStringWidth(" " + I18n.format("fml.configgui.tooltip.resetToDefault")) + resetGlyphWidth + 20;
         int buttonWidthHalf = (doneWidth + 5 + undoWidth + 5 + resetWidth) / 2;
         this.buttonList.add(btnDone = new GuiButtonExt(2000, this.width / 2 - buttonWidthHalf, this.height - 29, doneWidth, 20, I18n.format("gui.done")));
         this.buttonList.add(btnDefault = new GuiUnicodeGlyphButton(2001, this.width / 2 - buttonWidthHalf + doneWidth + 5 + undoWidth + 5,

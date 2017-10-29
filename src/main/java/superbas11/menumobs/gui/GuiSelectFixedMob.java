@@ -4,9 +4,9 @@ package superbas11.menumobs.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.config.GuiSelectString;
@@ -77,8 +77,8 @@ public class GuiSelectFixedMob extends GuiSelectString {
                             });
                 }
 
-                if (mc.fontRendererObj.getStringWidth(entry.getValue()) > maxEntryWidth)
-                    maxEntryWidth = mc.fontRendererObj.getStringWidth(entry.getValue());
+                if (mc.fontRenderer.getStringWidth(entry.getValue()) > maxEntryWidth)
+                    maxEntryWidth = mc.fontRenderer.getStringWidth(entry.getValue());
 
                 if (owningScreen.currentValue.equals(entry.getKey())) {
                     this.selectedIndex = index;
@@ -95,18 +95,18 @@ public class GuiSelectFixedMob extends GuiSelectString {
         }
 
         @Override
-        protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn) {
+        protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks) {
             int i = this.getSize();
             int categoryCount = 0;
             String lastCategory = "minecraft";
             Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer vertexbuffer = tessellator.getBuffer();
+            BufferBuilder vertexBuffer = tessellator.getBuffer();
 
             for (int j = 0; j < i; ++j) {
                 String slotValue = KeyList.get(j);
                 if (!slotValue.contains("minecraft:") && !slotValue.contains(lastCategory)) {
                     lastCategory = slotValue.split(":")[0];
-                    drawCenteredString(fontRendererObj, lastCategory, width / 2, insideTop + j * this.slotHeight + this.headerPadding + categoryCount * 18 + 4, 16777215);
+                    drawCenteredString(fontRenderer, lastCategory, width / 2, insideTop + j * this.slotHeight + this.headerPadding + categoryCount * 18 + 4, 16777215);
                     categoryCount++;
                 }
 
@@ -114,7 +114,7 @@ public class GuiSelectFixedMob extends GuiSelectString {
                 int l = this.slotHeight - 4;
 
                 if (k > this.bottom || k + l < this.top) {
-                    this.updateItemPos(j, insideLeft, k);
+                    this.updateItemPos(j, insideLeft, k, partialTicks);
                 }
 
                 if (this.showSelectionBox && this.isSelected(j)) {
@@ -122,20 +122,20 @@ public class GuiSelectFixedMob extends GuiSelectString {
                     int j1 = this.left + this.width / 2 + this.getListWidth() / 2;
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.disableTexture2D();
-                    vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                    vertexbuffer.pos((double) i1, (double) (k + l + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
-                    vertexbuffer.pos((double) j1, (double) (k + l + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
-                    vertexbuffer.pos((double) j1, (double) (k - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
-                    vertexbuffer.pos((double) i1, (double) (k - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
-                    vertexbuffer.pos((double) (i1 + 1), (double) (k + l + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
-                    vertexbuffer.pos((double) (j1 - 1), (double) (k + l + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
-                    vertexbuffer.pos((double) (j1 - 1), (double) (k - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
-                    vertexbuffer.pos((double) (i1 + 1), (double) (k - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                    vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+                    vertexBuffer.pos((double) i1, (double) (k + l + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+                    vertexBuffer.pos((double) j1, (double) (k + l + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+                    vertexBuffer.pos((double) j1, (double) (k - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+                    vertexBuffer.pos((double) i1, (double) (k - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+                    vertexBuffer.pos((double) (i1 + 1), (double) (k + l + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                    vertexBuffer.pos((double) (j1 - 1), (double) (k + l + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                    vertexBuffer.pos((double) (j1 - 1), (double) (k - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                    vertexBuffer.pos((double) (i1 + 1), (double) (k - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
                     tessellator.draw();
                     GlStateManager.enableTexture2D();
                 }
 
-                this.drawSlot(j, insideLeft, k, l, mouseXIn, mouseYIn);
+                this.drawSlot(j, insideLeft, k, l, mouseXIn, mouseYIn, partialTicks);
             }
         }
 

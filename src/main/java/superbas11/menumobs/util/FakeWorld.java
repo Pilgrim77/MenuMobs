@@ -32,6 +32,7 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -49,8 +50,8 @@ import java.util.List;
  */
 @SideOnly(Side.CLIENT)
 public class FakeWorld extends World {
-    public FakeWorld(WorldInfo worldInfo) {
-        super(new FakeSaveHandler(), worldInfo, new FakeWorldProvider(), new Profiler(), true);
+    public FakeWorld(WorldSettings worldSettings) {
+        super(new FakeSaveHandler(), new WorldInfo(worldSettings, "FakeWorld"), new FakeWorldProvider(), new Profiler(), true);
         this.provider.setWorld(this);
     }
 
@@ -669,16 +670,6 @@ public class FakeWorld extends World {
         @Override
         public String getSaveFolder() {
             return null;
-        }
-
-        @Override
-        public String getWelcomeMessage() {
-            return "";
-        }
-
-        @Override
-        public String getDepartMessage() {
-            return "";
         }
 
         @Override

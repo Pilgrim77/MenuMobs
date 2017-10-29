@@ -18,6 +18,11 @@ public class FakeNetworkManager extends NetworkManager {
     public Channel channel() {
         return new Channel() {
             @Override
+            public ChannelId id() {
+                return null;
+            }
+
+            @Override
             public EventLoop eventLoop() {
                 return null;
             }
@@ -70,6 +75,16 @@ public class FakeNetworkManager extends NetworkManager {
             @Override
             public boolean isWritable() {
                 return false;
+            }
+
+            @Override
+            public long bytesBeforeUnwritable() {
+                return 0;
+            }
+
+            @Override
+            public long bytesBeforeWritable() {
+                return 0;
             }
 
             @Override
@@ -244,6 +259,11 @@ public class FakeNetworkManager extends NetworkManager {
 
                     }
                 };
+            }
+
+            @Override
+            public <T> boolean hasAttr(AttributeKey<T> key) {
+                return false;
             }
 
             @Override

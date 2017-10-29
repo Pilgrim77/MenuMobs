@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -30,9 +31,13 @@ import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MovementInputFromOptions;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.GameType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -92,28 +97,39 @@ public class MainMenuRenderTicker {
         entityBlacklist.add("ml_GenericSimmFemale");
         entityBlacklist.add("ml_GenericVillager");
 
-        entityBlacklist.add(("biomesoplenty:phantom"));
-        entityBlacklist.add(("forestry:butterflyGE"));
-        entityBlacklist.add(("tConstruct:Crystal"));
-        entityBlacklist.add(("thaumcraft:Firebat"));
-        entityBlacklist.add(("thaumcraft:TaintSpore"));
-        entityBlacklist.add(("thaumcraft:TaintSwarm"));
-        entityBlacklist.add(("thaumcraft:Taintacle"));
-        entityBlacklist.add(("thaumcraft:TaintacleTiny"));
-        entityBlacklist.add(("thaumcraft:Wisp"));
-        entityBlacklist.add(("twilightForest:Boggard"));
-        entityBlacklist.add(("twilightForest:Firefly"));
-        entityBlacklist.add(("twilightForest:Helmet Crab"));
-        entityBlacklist.add(("twilightForest:Hydra"));
-        entityBlacklist.add(("twilightForest:HydraHead"));
-        entityBlacklist.add(("twilightForest:Lower Goblin Knight"));
-        entityBlacklist.add(("twilightForest:Mist Wolf"));
-        entityBlacklist.add(("twilightforest:Mosquito Swarm"));
-        entityBlacklist.add(("twilightForest:Upper Goblin Knight"));
-        entityBlacklist.add(("graves:playerzombie"));
-        entityBlacklist.add(("headcrumbs:Human"));
-        entityBlacklist.add(("thuttech:thuttechlift"));
-        entityBlacklist.add(("evilcraft:vengeanceSpirit"));
+        entityBlacklist.add("thaumcraft:firebat");
+        entityBlacklist.add("thaumcraft:taintSwarm");
+        entityBlacklist.add("thaumcraft:taintspore");
+        entityBlacklist.add("thaumcraft:taintacle");
+        entityBlacklist.add("thaumcraft:taintacletiny");
+        entityBlacklist.add("thaumcraft:wisp");
+
+        entityBlacklist.add("twilightforest:boggard");
+        entityBlacklist.add("twilightforest:firefly");
+        entityBlacklist.add("twilightforest:helmet_crab");
+        entityBlacklist.add("twilightforest:hydra");
+        entityBlacklist.add("twilightforest:hydra_head");
+        entityBlacklist.add("twilightforest:goblin_knight_lower");
+        entityBlacklist.add("twilightforest:mist_wolf");
+        entityBlacklist.add("twilightforest:mosquito_swarm");
+        entityBlacklist.add("twilightforest:snow_guardian");
+        entityBlacklist.add("twilightforest:goblin_knight_upper");
+        entityBlacklist.add("twilightforest:knight_phantom");
+
+        entityBlacklist.add("headcrumbs:Human");
+        entityBlacklist.add("thuttech:thuttechlift");
+        entityBlacklist.add("evilcraft:vengeanceSpirit");
+        entityBlacklist.add("minecolonies:citizen");
+        entityBlacklist.add("draconicevolution:guardiancrystal");
+        entityBlacklist.add("draconicevolution:chaosguardian");
+        entityBlacklist.add("computronics:swarm");
+        entityBlacklist.add("biomesoplenty:phantom");
+        entityBlacklist.add("forestry:butterflyge");
+        entityBlacklist.add("tConstruct:crystal");
+        entityBlacklist.add("cyclicmagic:magic_missile");
+        entityBlacklist.add("astralsorcery:entityflare");
+        entityBlacklist.add("astralsorcery:entityspectraltool");
+
 
         fallbackPlayerNames = new ArrayList<SimpleEntry<UUID, String>>();
         // UUIDs gotten using mctools.connorlinfoot.com
@@ -383,10 +399,11 @@ public class MainMenuRenderTicker {
         GlStateManager.disableDepth();
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 40, 8, 8, 128.0f, 128.0f);
         if (mouseX < 8 && mouseY < 8) {
-            GuiUtils.drawHoveringText(Collections.singletonList("Add mob to the blacklist"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
+            GuiUtils.drawHoveringText(Collections.singletonList("Add mob to the blacklist"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRenderer);
             GlStateManager.disableLighting();
             GlStateManager.resetColor();
         }
+        GlStateManager.enableDepth();
     }
 
     private void drawNextButton(int mouseX, int mouseY) {
@@ -399,11 +416,13 @@ public class MainMenuRenderTicker {
 
         if (mouseX > XOffset && mouseX < 6 + XOffset && mouseY < 8) {
             Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 14, 6, 9, 96, 96);
-            GuiUtils.drawHoveringText(Collections.singletonList("Next mob"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRendererObj);
+            GuiUtils.drawHoveringText(Collections.singletonList("Next mob"), mouseX, mouseY + 20, mcClient.currentScreen.width, mcClient.currentScreen.height, mcClient.currentScreen.width / 2, mcClient.fontRenderer);
             GlStateManager.disableLighting();
             GlStateManager.resetColor();
         } else
             Gui.drawModalRectWithCustomSizedTexture(XOffset + 1, 0, 4, 2, 6, 9, 96, 96);
+
+        GlStateManager.enableDepth();
     }
 
     @SubscribeEvent
@@ -414,6 +433,9 @@ public class MainMenuRenderTicker {
             this.unRegister();
         }
 
+        if (event.phase == TickEvent.Phase.START)
+            return;
+
         if (MenuMobs.instance.showMainMenuMobs && !erroredOut && isMainMenu(mcClient.currentScreen)) {
             try {
                 if ((player == null) || (player.world == null) || (randMob == null))
@@ -421,7 +443,7 @@ public class MainMenuRenderTicker {
 
                 //In cause of someone resetting the renderer. cough cough... schematica...
                 if (mcClient.getRenderManager().world == null || mcClient.getRenderManager().renderViewEntity == null)
-                    mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
+                    mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRenderer, player, player, mcClient.gameSettings, 0.0F);
 
                 if ((world != null) && (player != null) && (randMob != null)) {
                     mcClient.player = player;
@@ -447,8 +469,6 @@ public class MainMenuRenderTicker {
                             sr.getScaledWidth() - distanceToSide - mouseX,
                             ((sr.getScaledHeight() / 2) + (player.height * targetHeight)) - (player.height * targetHeight * (player.getEyeHeight() / player.height)) - mouseY,
                             player);
-
-
                     //Draw buttons
                     if (!(randMob instanceof EntityOtherPlayerMP))
                         drawBlacklistButton(mouseX, mouseY);
@@ -477,7 +497,7 @@ public class MainMenuRenderTicker {
             //Blacklist button
             if (mouseX < 8 && mouseY < 8 && !isPlayer) {
                 Set<String> blacklist = new HashSet<String>(Arrays.asList(MenuMobs.instance.blacklist.getStringList()));
-                blacklist.add(EntityList.getEntityString(randMob));
+                blacklist.add(EntityList.getKey(randMob).toString());
                 MenuMobs.instance.blacklist.set(blacklist.toArray(new String[]{}));
                 Reference.config.save();
                 randMob = null;
@@ -511,10 +531,10 @@ public class MainMenuRenderTicker {
     private void init() {
         try {
             boolean createNewWorld = world == null;
-            WorldInfo worldInfo = new WorldInfo(new NBTTagCompound());
+            WorldSettings worldSettings = new WorldSettings(0, GameType.NOT_SET, true, false, WorldType.DEFAULT);
 
             if (createNewWorld)
-                world = new FakeWorld(worldInfo);
+                world = new FakeWorld(worldSettings);
 
             if (createNewWorld || (player == null)) {
                 player = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
@@ -527,7 +547,7 @@ public class MainMenuRenderTicker {
                     public NetworkPlayerInfo getPlayerInfo(String name) {
                         return new NetworkPlayerInfo(mcClient.getSession().getProfile());
                     }
-                }, null);
+                }, null, null);
                 int ModelParts = 0;
                 for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
                     ModelParts |= enumplayermodelparts.getPartMask();
@@ -560,7 +580,7 @@ public class MainMenuRenderTicker {
             }
 
             EntityUtils.updateLightmap(mcClient, world);
-            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRendererObj, player, player, mcClient.gameSettings, 0.0F);
+            mcClient.getRenderManager().cacheActiveRenderInfo(world, mcClient.fontRenderer, player, player, mcClient.gameSettings, 0.0F);
         } catch (Throwable e) {
             LogHelper.severe("Main menu mob rendering encountered a serious error and has been disabled for the remainder of this session.");
             e.printStackTrace();
@@ -601,7 +621,7 @@ public class MainMenuRenderTicker {
             return false;
         else if (gui instanceof GuiMainMenu)
             return true;
-        else if (Loader.isModLoaded("CustomMainMenu")) {
+        else if (Loader.isModLoaded("custommainmenu")) {
             try {
                 flag = gui.getClass().getCanonicalName().equalsIgnoreCase("lumien.custommainmenu.gui.GuiCustom");
             } catch (Exception e) {

@@ -39,18 +39,18 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         }
 
         @Override
-        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
-            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
+            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
 
             btnPlayer.width = ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2;
-            btnPlayer.xPosition = listWidth / 4;
-            btnPlayer.yPosition = y;
-            btnPlayer.drawButton(mc, mouseX, mouseY);
+            btnPlayer.x = listWidth / 4;
+            btnPlayer.y = y;
+            btnPlayer.drawButton(mc, mouseX, mouseY, partial);
 
             btnEntity.width = ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 - 2;
-            btnEntity.xPosition = listWidth / 4 + ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 + 2;
-            btnEntity.yPosition = y;
-            btnEntity.drawButton(mc, mouseX, mouseY);
+            btnEntity.x = listWidth / 4 + ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth / 2 + 2;
+            btnEntity.y = y;
+            btnEntity.drawButton(mc, mouseX, mouseY, partial);
         }
 
         @Override
@@ -128,13 +128,13 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         }
 
         @Override
-        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
-            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
+            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
 
             btnValue.width = ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth;
-            btnValue.xPosition = listWidth / 4;
-            btnValue.yPosition = y;
-            btnValue.drawButton(mc, mouseX, mouseY);
+            btnValue.x = listWidth / 4;
+            btnValue.y = y;
+            btnValue.drawButton(mc, mouseX, mouseY, partial);
         }
 
         @Override
@@ -154,18 +154,18 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
 
         public FixedPlayerArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
             super(owningScreen, owningEntryList, configElement);
-            this.textFieldValue = new GuiTextField(0, mc.fontRendererObj, owningEntryList.width / 4 + 1, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth - 3, 16);
+            this.textFieldValue = new GuiTextField(0, mc.fontRenderer, owningEntryList.width / 4 + 1, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth - 3, 16);
             this.textFieldValue.setMaxStringLength(10000);
             this.textFieldValue.setText(value.toString());
         }
 
         @Override
-        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
-            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
+            super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
 
             if (configElement.isListLengthFixed() || slotIndex != owningEntryList.listEntries.size() - 1) {
                 this.textFieldValue.setVisible(true);
-                this.textFieldValue.yPosition = y + 1;
+                this.textFieldValue.y = y + 1;
                 this.textFieldValue.drawTextBox();
             } else
                 this.textFieldValue.setVisible(false);

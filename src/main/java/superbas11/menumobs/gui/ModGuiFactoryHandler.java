@@ -3,6 +3,8 @@ package superbas11.menumobs.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Set;
 
@@ -13,17 +15,18 @@ public class ModGuiFactoryHandler implements IModGuiFactory {
     }
 
     @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return GuiBSConfig.class;
+    public boolean hasConfigGui() {
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public GuiScreen createConfigGui(GuiScreen parentScreen) {
+        return new GuiBSConfig(parentScreen);
     }
 
     @Override
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
-        return null;
-    }
-
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
         return null;
     }
 }

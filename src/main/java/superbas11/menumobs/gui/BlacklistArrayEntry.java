@@ -15,13 +15,13 @@ public class BlacklistArrayEntry extends GuiEditArrayEntries.BaseEntry {
     }
 
     @Override
-    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
-        super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected);
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks) {
+        super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partialTicks);
 
         btnValue.width = owningEntryList.controlWidth;
-        btnValue.xPosition = listWidth / 4;
-        btnValue.yPosition = y;
-        btnValue.drawButton(owningEntryList.getMC(), mouseX, mouseY);
+        btnValue.x= listWidth / 4;
+        btnValue.y = y;
+        btnValue.drawButton(owningEntryList.getMC(), mouseX, mouseY,partialTicks);
     }
 
     @Override

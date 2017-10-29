@@ -184,7 +184,7 @@ public class EntityUtils {
             RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
             rendermanager.setPlayerViewY(180.0F);
             rendermanager.setRenderShadow(false);
-            rendermanager.doRenderEntity(ent, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, true);
+            rendermanager.renderEntity(ent, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, true);
             rendermanager.setRenderShadow(true);
         } finally {
             ent.renderYawOffset = f2;
@@ -199,6 +199,7 @@ public class EntityUtils {
             GlStateManager.disableTexture2D();
             GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
             GlStateManager.translate(0.0F, 0.0F, 20.0F);
+            GlStateManager.resetColor();
         }
     }
 

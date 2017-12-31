@@ -7,8 +7,8 @@ public class VolumeSliderEntry extends GuiConfigEntries.ButtonEntry {
 
     public VolumeSliderEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
         super(owningScreen, owningEntryList, configElement, new GuiSlider(0, owningEntryList.controlX, 0, owningEntryList.controlWidth, 18,
-                "", "", Double.valueOf(configElement.getMinValue().toString()), Double.valueOf(configElement.getMaxValue().toString()),
-                Double.valueOf(configElement.get().toString()), configElement.getType() == ConfigGuiType.DOUBLE, true) {
+                                                                          "", "", Double.valueOf(configElement.getMinValue().toString()), Double.valueOf(configElement.getMaxValue().toString()),
+                                                                          Double.valueOf(configElement.get().toString()), configElement.getType() == ConfigGuiType.DOUBLE, true) {
             @Override
             public void updateSlider() {
                 if (this.sliderValue < 0.0F) {

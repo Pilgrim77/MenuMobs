@@ -11,7 +11,7 @@ public class BlacklistArrayEntry extends GuiEditArrayEntries.BaseEntry {
     public BlacklistArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
         super(owningScreen, owningEntryList, configElement);
         btnValue = new GuiButtonExt(0, owningEntryList.controlWidth, 0, owningEntryList.controlWidth, 18,
-                value.toString());
+                                    value.toString());
     }
 
     @Override
@@ -19,9 +19,9 @@ public class BlacklistArrayEntry extends GuiEditArrayEntries.BaseEntry {
         super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partialTicks);
 
         btnValue.width = owningEntryList.controlWidth;
-        btnValue.x= listWidth / 4;
+        btnValue.x = listWidth / 4;
         btnValue.y = y;
-        btnValue.drawButton(owningEntryList.getMC(), mouseX, mouseY,partialTicks);
+        btnValue.drawButton(owningEntryList.getMC(), mouseX, mouseY, partialTicks);
     }
 
     @Override

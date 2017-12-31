@@ -13,7 +13,6 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
@@ -26,7 +25,6 @@ import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MovementInputFromOptions;
 import net.minecraft.util.ResourceLocation;
@@ -48,7 +46,6 @@ import org.lwjgl.input.Mouse;
 import superbas11.menumobs.client.util.EntityUtils;
 import superbas11.menumobs.client.util.UUIDFetcher;
 import superbas11.menumobs.util.FakeNetHandlerPlayClient;
-import superbas11.menumobs.util.FakeNetworkManager;
 import superbas11.menumobs.util.FakeWorld;
 import superbas11.menumobs.util.LogHelper;
 
@@ -530,7 +527,7 @@ public class MainMenuRenderTicker {
             WorldSettings worldSettings = new WorldSettings(0, GameType.NOT_SET, true, false, WorldType.DEFAULT);
             FakeNetHandlerPlayClient netHandler = new FakeNetHandlerPlayClient(mcClient);
 
-            if (createNewWorld){
+            if (createNewWorld) {
                 world = new FakeWorld(worldSettings, netHandler);
             }
 

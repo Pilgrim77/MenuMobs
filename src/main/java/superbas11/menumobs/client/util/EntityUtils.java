@@ -239,7 +239,7 @@ public class EntityUtils {
             clazz = (Class) EntityList.getClass(new ResourceLocation(entStrings[id]));
         }
         while (!EntityLivingBase.class.isAssignableFrom(clazz)
-                && (++tries <= numberOfAttempts));
+               && (++tries <= numberOfAttempts));
 
         if (!EntityLivingBase.class.isAssignableFrom(clazz)) {
             if (fallbackPlayerNames != null) {

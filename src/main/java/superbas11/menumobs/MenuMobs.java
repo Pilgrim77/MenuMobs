@@ -55,7 +55,7 @@ public class MenuMobs {
         Reference.config.load();
 
         Reference.config.setCategoryComment(ctgyGen, "ATTENTION: Editing this file manually is no longer necessary. \n" +
-                "On the Mods list screen select the entry for menumobs, then click the Config button to modify these settings.");
+                                                     "On the Mods list screen select the entry for menumobs, then click the Config button to modify these settings.");
 
         List<String> orderedKeys = new ArrayList<String>(ConfigElements.values().length);
 

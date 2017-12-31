@@ -71,10 +71,10 @@ public class GuiSelectFixedMob extends GuiSelectString {
                 if (!slotValue.contains("minecraft:") && !slotValue.contains(lastCategory)) {
                     lastCategory = slotValue.split(":")[0];
                     categories.put(lastCategory,
-                            new Integer[]{
-                                    index * this.slotHeight + this.headerPadding + categories.size() * 18 - 4,
-                                    categories.size() + 1
-                            });
+                                   new Integer[]{
+                                           index * this.slotHeight + this.headerPadding + categories.size() * 18 - 4,
+                                           categories.size() + 1
+                                   });
                 }
 
                 if (mc.fontRenderer.getStringWidth(entry.getValue()) > maxEntryWidth)

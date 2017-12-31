@@ -80,7 +80,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         public FixedMobArrayEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
             super(owningScreen, owningEntryList, configElement);
             btnValue = new GuiButtonExt(0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 0, ((GuiFixedMobEntry.GuiEditFixedMobEntries) owningEntryList).controlWidth, 18,
-                    value.toString());
+                                        value.toString());
             currentValue = value.toString();
             updateValueButtonText();
         }
@@ -175,7 +175,7 @@ public abstract class FixedEntityArrayEntry extends GuiEditArrayEntries.BaseEntr
         @Override
         public void keyTyped(char eventChar, int eventKey) {
             if (this.enabled || eventKey == Keyboard.KEY_LEFT || eventKey == Keyboard.KEY_RIGHT
-                    || eventKey == Keyboard.KEY_HOME || eventKey == Keyboard.KEY_END) {
+                || eventKey == Keyboard.KEY_HOME || eventKey == Keyboard.KEY_END) {
                 this.textFieldValue.textboxKeyTyped((this.enabled ? eventChar : Keyboard.CHAR_NONE), eventKey);
 
                 if (configElement.getValidationPattern() != null) {

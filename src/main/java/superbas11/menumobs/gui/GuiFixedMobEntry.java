@@ -44,9 +44,9 @@ public class GuiFixedMobEntry extends GuiEditArray {
         int buttonWidthHalf = (doneWidth + 5 + undoWidth + 5 + resetWidth) / 2;
         this.buttonList.add(btnDone = new GuiButtonExt(2000, this.width / 2 - buttonWidthHalf, this.height - 29, doneWidth, 20, I18n.format("gui.done")));
         this.buttonList.add(btnDefault = new GuiUnicodeGlyphButton(2001, this.width / 2 - buttonWidthHalf + doneWidth + 5 + undoWidth + 5,
-                this.height - 29, resetWidth, 20, " " + I18n.format("fml.configgui.tooltip.resetToDefault"), RESET_CHAR, 2.0F));
+                                                                   this.height - 29, resetWidth, 20, " " + I18n.format("fml.configgui.tooltip.resetToDefault"), RESET_CHAR, 2.0F));
         this.buttonList.add(btnUndoChanges = new GuiUnicodeGlyphButton(2002, this.width / 2 - buttonWidthHalf + doneWidth + 5,
-                this.height - 29, undoWidth, 20, " " + I18n.format("fml.configgui.tooltip.undoChanges"), UNDO_CHAR, 2.0F));
+                                                                       this.height - 29, undoWidth, 20, " " + I18n.format("fml.configgui.tooltip.undoChanges"), UNDO_CHAR, 2.0F));
     }
 
     /**
@@ -87,7 +87,7 @@ public class GuiFixedMobEntry extends GuiEditArray {
                             clazz = FixedEntityArrayEntry.FixedPlayerArrayEntry.class;
 
                         listEntries.add(clazz.getConstructor(GuiEditArray.class, GuiEditArrayEntries.class, IConfigElement.class, Object.class)
-                                .newInstance(this.owningGui, this, configElement, value.toString()));
+                                                .newInstance(this.owningGui, this, configElement, value.toString()));
                     } catch (Throwable e) {
                         FMLLog.severe("There was a critical error instantiating the custom IGuiEditListEntry for property %s.", configElement.getName());
                         e.printStackTrace();

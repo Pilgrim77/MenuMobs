@@ -12,9 +12,9 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -26,7 +26,6 @@ import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MovementInputFromOptions;
@@ -35,9 +34,7 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -50,11 +47,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import superbas11.menumobs.client.util.EntityUtils;
 import superbas11.menumobs.client.util.UUIDFetcher;
+import superbas11.menumobs.util.FakeNetHandlerPlayClient;
 import superbas11.menumobs.util.FakeNetworkManager;
 import superbas11.menumobs.util.FakeWorld;
 import superbas11.menumobs.util.LogHelper;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleEntry;
@@ -216,7 +213,7 @@ public class MainMenuRenderTicker {
         id = -1;
     }
 
-    private World world;
+    private WorldClient world;
     private EntityLivingBase randMob;
     private EntityPlayerSP player;
 
@@ -254,7 +251,7 @@ public class MainMenuRenderTicker {
 
         do {
             id = random.nextInt(entityList.length);
-            clazz = (Class) EntityList.getClass(new ResourceLocation(entityList[id]));
+            clazz = EntityList.getClass(new ResourceLocation(entityList[id]));
             if (clazz == null) {
                 try {
                     UUID UUID = UUIDFetcher.getUUIDOf(entityList[id]);
@@ -267,7 +264,6 @@ public class MainMenuRenderTicker {
                     GameProfile gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(UUID, entityList[id]), true);
                     final NetworkPlayerInfo networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
                     entity = new EntityOtherPlayerMP(world, gameProfile) {
-                        @Nullable
                         @Override
                         protected NetworkPlayerInfo getPlayerInfo() {
                             return networkPlayerInfo;
@@ -367,13 +363,10 @@ public class MainMenuRenderTicker {
     }
 
     private static EntityOtherPlayerMP getRandomPlayer(World world) {
-        final NetworkPlayerInfo networkPlayerInfo;
-        GameProfile gameProfile;
         SimpleEntry<UUID, String> entry = fallbackPlayerNames.get(random.nextInt(fallbackPlayerNames.size()));
-        gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
-        networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
+        GameProfile gameProfile = mcClient.getSessionService().fillProfileProperties(new GameProfile(entry.getKey(), entry.getValue()), true);
+        final NetworkPlayerInfo networkPlayerInfo = new NetworkPlayerInfo(gameProfile);
         return new EntityOtherPlayerMP(world, gameProfile) {
-            @Nullable
             @Override
             protected NetworkPlayerInfo getPlayerInfo() {
                 return networkPlayerInfo;
@@ -448,6 +441,7 @@ public class MainMenuRenderTicker {
 
                 if ((world != null) && (player != null) && (randMob != null)) {
                     mcClient.player = player;
+                    mcClient.world = world;
                     ScaledResolution sr = new ScaledResolution(mcClient);
                     final int mouseX = (Mouse.getX() * sr.getScaledWidth()) / mcClient.displayWidth;
                     final int mouseY = sr.getScaledHeight() - ((Mouse.getY() * sr.getScaledHeight()) / mcClient.displayHeight) - 1;
@@ -484,6 +478,7 @@ public class MainMenuRenderTicker {
                 world = null;
             }
             mcClient.player = null;
+            mcClient.world = null;
         }
     }
 
@@ -533,22 +528,19 @@ public class MainMenuRenderTicker {
         try {
             boolean createNewWorld = world == null;
             WorldSettings worldSettings = new WorldSettings(0, GameType.NOT_SET, true, false, WorldType.DEFAULT);
+            FakeNetHandlerPlayClient netHandler = new FakeNetHandlerPlayClient(mcClient);
 
-            if (createNewWorld)
-                world = new FakeWorld(worldSettings);
+            if (createNewWorld){
+                world = new FakeWorld(worldSettings, netHandler);
+            }
+
 
             if (createNewWorld || (player == null)) {
-                player = new EntityPlayerSP(mcClient, world, new NetHandlerPlayClient(mcClient, mcClient.currentScreen, new FakeNetworkManager(EnumPacketDirection.CLIENTBOUND), mcClient.getSession().getProfile()) {
-                    @Override
-                    public NetworkPlayerInfo getPlayerInfo(UUID uniqueId) {
-                        return new NetworkPlayerInfo(mcClient.getSession().getProfile());
-                    }
-
-                    @Override
-                    public NetworkPlayerInfo getPlayerInfo(String name) {
-                        return new NetworkPlayerInfo(mcClient.getSession().getProfile());
-                    }
-                }, null, null);
+                player = new EntityPlayerSP(mcClient,
+                                            world,
+                                            netHandler,
+                                            null,
+                                            null);
                 int ModelParts = 0;
                 for (EnumPlayerModelParts enumplayermodelparts : mcClient.gameSettings.getModelParts()) {
                     ModelParts |= enumplayermodelparts.getPartMask();

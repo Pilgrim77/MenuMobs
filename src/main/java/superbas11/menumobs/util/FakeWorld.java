@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -49,9 +50,11 @@ import java.util.List;
  * @author superbas11
  */
 @SideOnly(Side.CLIENT)
-public class FakeWorld extends World {
-    public FakeWorld(WorldSettings worldSettings) {
-        super(new FakeSaveHandler(), new WorldInfo(worldSettings, "FakeWorld"), new FakeWorldProvider(), new Profiler(), true);
+public class FakeWorld extends WorldClient {
+
+    public FakeWorld(WorldSettings worldSettings, FakeNetHandlerPlayClient netHandler) {
+        //super(new FakeSaveHandler(), new WorldInfo(worldSettings, "FakeWorld"), new FakeWorldProvider(), new Profiler(), true);
+        super(netHandler, worldSettings, 0, EnumDifficulty.HARD, new Profiler());
         this.provider.setWorld(this);
     }
 
@@ -223,6 +226,14 @@ public class FakeWorld extends World {
     public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
         PositionedSoundRecord positionedsoundrecord = new PositionedSoundRecord(soundIn.getSoundName(), SoundCategory.MASTER, (float) MenuMobs.instance.mobSoundVolume, pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F);
         FMLClientHandler.instance().getClient().getSoundHandler().playSound(positionedsoundrecord);
+    }
+
+    @Override
+    public void playSound(BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay) {
+    }
+
+    @Override
+    public void playSound(double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay) {
     }
 
     @Override

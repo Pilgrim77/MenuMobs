@@ -1,0 +1,10 @@
+superbas11.configgui.showMainMenuMobs=Отображать мобов в Главном меню
+superbas11.configgui.showMainMenuMobs.tooltip=Установите значение "true" для отображения случайных мобов при входе персонажа в Главное меню, либо значение "false" для отключения возможности.
+superbas11.configgui.showOnlyPlayerModels=Отображать только модели игроков
+superbas11.configgui.showOnlyPlayerModels.tooltip=
+superbas11.configgui.mobSoundVolume=Громкость звука
+superbas11.configgui.mobSoundVolume.tooltip=
+superbas11.configgui.fixedMob=Избранные объекты
+superbas11.configgui.fixedMob.tooltip=Список объектов, которые будут отображаться в Главном меню.
+superbas11.configgui.allowDebugOutput=Разрешить отправку отладочной информации
+superbas11.configgui.allowDebugOutput.tooltip=
